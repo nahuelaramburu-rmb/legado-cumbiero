@@ -1,11 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import * as db from "@/lib/db";
 import { TopNav } from "@/components/TopNav";
 import { EventCard } from "@/components/EventCard";
 import { TenantCard } from "@/components/TenantCard";
-import { DiscoScene } from "@/components/DiscoScene";
-import { CumbiaGear } from "@/components/CumbiaGear";
-import { IconCalendar, IconChevronRight, IconCrown, IconMapPin, IconSearch } from "@/components/icons";
+import { IconCalendar, IconChevronRight, IconMapPin, IconSearch } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -18,22 +17,20 @@ export default async function HomePage() {
       <TopNav />
       <main>
         <section className="relative overflow-hidden border-b border-white/10 bg-black">
-          <div className="relative flex h-[380px] flex-col justify-center overflow-hidden sm:h-[440px] lg:h-[500px]">
-            <DiscoScene tint="#FF2E93" variant="hero" />
+          <div className="relative flex h-[380px] flex-col justify-end overflow-hidden sm:h-[440px] lg:h-[500px]">
+            <Image
+              src="/hero-banner.png"
+              alt="La cumbia de siempre, en la fiesta de hoy — Legado Cumbiero, 90's y 2000's"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
-            {/* arte de cassette + grabador, esquina inferior derecha (oculto en mobile) */}
-            <CumbiaGear className="pointer-events-none absolute -right-4 bottom-2 hidden w-48 opacity-90 drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] sm:block lg:w-56" />
-            <span className="badge pointer-events-none absolute bottom-24 right-6 hidden -rotate-6 border border-dashed border-cumbia-cyan/60 bg-black/60 text-xs font-bold tracking-wide text-cumbia-cyan backdrop-blur-sm sm:inline-block lg:right-10">
-              90&apos;S · 2000&apos;S
-            </span>
-
-            <div className="relative z-10 mx-auto w-full max-w-6xl px-6">
-              <h1 className="flex max-w-xl flex-wrap items-center gap-3 text-4xl font-black leading-[1.05] text-cumbia-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] sm:text-5xl">
-                La cumbia de siempre,
-                <IconCrown size={30} className="text-cumbia-yellow drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]" />
-                <span className="text-cumbia-pink">en la fiesta de hoy</span>
-              </h1>
-              <p className="mt-4 max-w-xl text-cumbia-cream/80">
+            <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-8">
+              <h1 className="sr-only">La cumbia de siempre, en la fiesta de hoy</h1>
+              <p className="max-w-xl text-cumbia-cream/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
                 Legado Cumbiero conecta boliches: entradas, listas de invitados, usuarios
                 y line-ups — cada local con su propia identidad, todos en un solo lugar.
               </p>
