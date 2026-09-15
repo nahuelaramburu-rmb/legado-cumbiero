@@ -17,7 +17,7 @@ export default async function HomePage() {
       <TopNav showBrand={false} />
       <main>
         <section className="relative overflow-hidden border-b border-white/10 bg-black">
-          <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-[188px] -translate-x-1/2 -translate-y-1/2 sm:w-[274px] lg:w-[342px] xl:w-[410px]">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-[188px] -translate-x-1/2 -translate-y-[60%] sm:w-[274px] lg:w-[342px] xl:w-[410px]">
             <div className="absolute inset-0 -z-10 scale-110 rounded-full bg-cumbia-pink/30 blur-3xl" />
             <Image
               src="/logo-badge.png"
