@@ -28,7 +28,7 @@ export default async function HomePage() {
               fill
               priority
               sizes="100vw"
-              className="object-cover"
+              className="object-cover object-[center_70%]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
           </div>
