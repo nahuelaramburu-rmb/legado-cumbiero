@@ -1,0 +1,32 @@
+services:
+  legado-cumbiero:
+    build: .
+    container_name: legado-cumbiero
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      # Si tu VPS usa el patrón nginx-proxy + acme-companion (nginx-proxy /
+      # letsencrypt-nginx-proxy-companion), descomentá estas 4 líneas y
+      # conectá este servicio a la red de ese proxy (ver networks abajo):
+      # - VIRTUAL_HOST=legadocumbiero.rmbcorp.com
+      # - VIRTUAL_PORT=3000
+      # - LETSENCRYPT_HOST=legadocumbiero.rmbcorp.com
+      # - LETSENCRYPT_EMAIL=admin@rmbcorp.com
+    volumes:
+      - legado-cumbiero-data:/app/data
+    # Si tu nginx NO es del patrón nginx-proxy (por ejemplo nginx directo en
+    # el host, o un nginx dockerizado con conf.d montado a mano), exponé el
+    # puerto acá y apuntá el server block de nginx a 127.0.0.1:3050:
+    # ports:
+    #   - "127.0.0.1:3050:3000"
+    networks:
+      - default
+      # - nginx-proxy   # descomentar y poner el nombre real de la red compartida
+
+volumes:
+  legado-cumbiero-data:
+
+networks:
+  default: {}
+  # nginx-proxy:
+  #   external: true
