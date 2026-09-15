@@ -17,8 +17,16 @@ export default async function HomePage() {
       <TopNav showBrand={false} />
       <main>
         <section className="relative overflow-hidden border-b border-white/10 bg-black">
-          <div className="pointer-events-none absolute left-4 top-0 z-20 w-28 drop-shadow-[0_10px_26px_rgba(0,0,0,0.65)] sm:left-6 sm:w-40 lg:w-56 xl:w-64">
-            <Image src="/logo-badge.png" alt="Legado Cumbiero" width={1254} height={1254} className="h-auto w-full" priority />
+          <div className="pointer-events-none absolute left-6 top-1/2 z-20 w-36 -translate-y-1/2 sm:left-10 sm:w-52 lg:left-14 lg:w-72 xl:w-80">
+            <div className="absolute inset-0 -z-10 scale-110 rounded-full bg-cumbia-pink/30 blur-3xl" />
+            <Image
+              src="/logo-badge.png"
+              alt="Legado Cumbiero"
+              width={1254}
+              height={1254}
+              className="h-auto w-full drop-shadow-[0_14px_34px_rgba(0,0,0,0.75)]"
+              priority
+            />
           </div>
 
           <div className="relative flex h-[380px] flex-col justify-end overflow-hidden sm:h-[440px] lg:h-[500px]">
