@@ -4,6 +4,7 @@ import * as db from "@/lib/db";
 import { TopNav } from "@/components/TopNav";
 import { DiscoScene } from "@/components/DiscoScene";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { IconArrowLeft, IconMapPin } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,9 @@ export default async function TenantPage({
             <Link
               href="/boliches"
               aria-label="Volver"
-              className="grid h-10 w-10 place-items-center rounded-full bg-black/40 text-lg backdrop-blur-sm"
+              className="grid h-10 w-10 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm"
             >
-              ←
+              <IconArrowLeft size={18} />
             </Link>
             <FavoriteButton />
           </div>
@@ -46,7 +47,9 @@ export default async function TenantPage({
             Tenant: {tenant.name}
           </span>
           <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-6">
-            <p className="flex items-center gap-1 text-sm text-cumbia-cream/70">📍 {tenant.city}</p>
+            <p className="flex items-center gap-1 text-sm text-cumbia-cream/70">
+              <IconMapPin size={14} className="text-white/80" /> {tenant.city}
+            </p>
             <h1 className="text-4xl font-black text-cumbia-cream drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
               {tenant.name}
             </h1>
@@ -65,9 +68,9 @@ export default async function TenantPage({
               href={mapsHref}
               target="_blank"
               rel="noreferrer"
-              className="btn-secondary ml-auto"
+              className="btn-secondary ml-auto inline-flex items-center gap-1.5"
             >
-              📍 Ver mapa
+              <IconMapPin size={15} /> Ver mapa
             </a>
           </div>
 

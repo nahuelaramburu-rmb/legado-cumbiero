@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Tenant } from "@/lib/db";
 import { DiscoScene } from "@/components/DiscoScene";
+import { IconArrowRight, IconMapPin } from "@/components/icons";
 
 export function TenantCard({ tenant, nextShowTitle }: { tenant: Tenant; nextShowTitle?: string }) {
   return (
@@ -13,7 +14,9 @@ export function TenantCard({ tenant, nextShowTitle }: { tenant: Tenant; nextShow
           <h3 className="truncate font-bold text-cumbia-cream">{tenant.name}</h3>
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: tenant.accentColor }} />
         </div>
-        <p className="text-xs text-cumbia-cream/60">📍 {tenant.city}</p>
+        <p className="flex items-center gap-1 text-xs text-cumbia-cream/60">
+          <IconMapPin size={13} className="shrink-0 text-white/70" /> {tenant.city}
+        </p>
         <div className="mt-1 flex flex-wrap gap-1.5">
           {tenant.amenities.slice(0, 3).map((a) => (
             <span key={a} className="chip">
@@ -23,7 +26,10 @@ export function TenantCard({ tenant, nextShowTitle }: { tenant: Tenant; nextShow
         </div>
         {nextShowTitle && <p className="mt-1 truncate text-xs text-cumbia-gold">Próximo: {nextShowTitle}</p>}
       </div>
-      <span className="shrink-0 text-cumbia-pink opacity-0 transition group-hover:opacity-100">→</span>
+      <IconArrowRight
+        size={16}
+        className="shrink-0 text-cumbia-pink opacity-0 transition group-hover:opacity-100"
+      />
     </Link>
   );
 }

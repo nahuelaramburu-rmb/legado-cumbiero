@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconMinus, IconPlus } from "@/components/icons";
 
 export function QuantityStepper({ max = 10 }: { max?: number }) {
   const [value, setValue] = useState(1);
@@ -12,19 +13,19 @@ export function QuantityStepper({ max = 10 }: { max?: number }) {
         <button
           type="button"
           onClick={() => setValue((v) => Math.max(1, v - 1))}
-          className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-lg font-bold text-cumbia-cream hover:border-cumbia-pink hover:text-cumbia-pink"
+          className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-cumbia-cream hover:border-cumbia-pink hover:text-cumbia-pink"
           aria-label="Restar"
         >
-          −
+          <IconMinus size={16} />
         </button>
         <span className="w-6 text-center text-lg font-bold text-cumbia-cream">{value}</span>
         <button
           type="button"
           onClick={() => setValue((v) => Math.min(max, v + 1))}
-          className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-lg font-bold text-cumbia-cream hover:border-cumbia-pink hover:text-cumbia-pink"
+          className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-cumbia-cream hover:border-cumbia-pink hover:text-cumbia-pink"
           aria-label="Sumar"
         >
-          +
+          <IconPlus size={16} />
         </button>
         <span className="text-xs text-cumbia-cream/40">Máx. {max} por reserva</span>
       </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Show, Tenant } from "@/lib/db";
 import { DiscoScene } from "@/components/DiscoScene";
+import { IconMapPin } from "@/components/icons";
 
 const MONTHS = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 const WEEKDAYS = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
@@ -36,7 +37,7 @@ export function EventCard({ show, tenant, big = false }: { show: Show; tenant: T
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="font-bold leading-tight text-cumbia-cream">{show.title}</h3>
         <p className="flex items-center gap-1 text-xs text-cumbia-cream/60">
-          📍 {tenant.name} · {tenant.city}
+          <IconMapPin size={13} className="shrink-0 text-white/70" /> {tenant.name} · {tenant.city}
         </p>
         <span className="chip w-fit">{genre}</span>
         <div className="mt-auto pt-2">

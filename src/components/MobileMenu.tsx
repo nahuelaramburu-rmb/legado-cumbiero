@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { IconClose, IconMenu } from "@/components/icons";
 
 const LINKS = [
   { href: "/", label: "Inicio" },
@@ -22,9 +23,9 @@ export function MobileMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-label="Menú"
         aria-expanded={open}
-        className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-cumbia-cream/80"
+        className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white"
       >
-        {open ? "✕" : "☰"}
+        {open ? <IconClose size={18} /> : <IconMenu size={18} />}
       </button>
       {open && (
         <div className="absolute inset-x-0 top-full z-20 border-b border-white/10 bg-cumbia-night/95 px-6 py-3 backdrop-blur-md">

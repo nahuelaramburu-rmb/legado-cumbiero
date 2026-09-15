@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MobileMenu } from "@/components/MobileMenu";
+import { NavLinks } from "@/components/NavLinks";
+import { IconSearch, IconUser } from "@/components/icons";
 
 export function TopNav({
   tenantName,
@@ -19,20 +21,7 @@ export function TopNav({
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-semibold text-cumbia-cream/80 md:flex">
-          <Link href="/" className="hover:text-cumbia-pink">
-            Inicio
-          </Link>
-          <Link href="/eventos" className="hover:text-cumbia-pink">
-            Eventos
-          </Link>
-          <Link href="/boliches" className="hover:text-cumbia-pink">
-            Boliches
-          </Link>
-          <Link href="/reservas" className="hover:text-cumbia-pink">
-            Reservas
-          </Link>
-        </nav>
+        <NavLinks />
 
         <div className="flex items-center gap-3">
           {tenantSlug && tenantName && (
@@ -49,16 +38,16 @@ export function TopNav({
           <Link
             href="/boliches"
             aria-label="Buscar"
-            className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-cumbia-cream/70 hover:border-cumbia-pink hover:text-cumbia-pink"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white hover:border-cumbia-pink hover:text-cumbia-pink"
           >
-            🔍
+            <IconSearch size={18} />
           </Link>
           <Link
             href="/perfil"
             aria-label="Perfil"
-            className="hidden h-9 w-9 place-items-center rounded-full border border-white/15 text-cumbia-cream/70 hover:border-cumbia-pink hover:text-cumbia-pink md:grid"
+            className="hidden h-9 w-9 place-items-center rounded-full border border-white/15 text-white hover:border-cumbia-pink hover:text-cumbia-pink md:grid"
           >
-            👤
+            <IconUser size={18} />
           </Link>
           <Link href="/master" className="hidden text-sm text-cumbia-cream/50 hover:text-white sm:inline">
             Panel maestro

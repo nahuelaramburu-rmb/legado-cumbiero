@@ -65,19 +65,19 @@ export function DiscoScene({
         </g>
       )}
 
-      {/* bola de espejos */}
-      <g transform={`translate(${crowd ? 300 : 300} ${crowd ? 55 : 60})`}>
-        <line x1="0" y1="-70" x2="0" y2="-22" stroke="#3a3a3a" strokeWidth="1.5" />
-        <circle r="22" fill={`url(#ball-${id})`} />
+      {/* bola de espejos — grande y semi-cortada por el borde en el hero, como en el mockup */}
+      <g transform={`translate(${crowd ? 372 : 300} ${crowd ? 38 : 60})`}>
+        <line x1="0" y1={crowd ? -60 : -70} x2="0" y2={crowd ? -34 : -22} stroke="#3a3a3a" strokeWidth="1.5" />
+        <circle r={crowd ? 34 : 22} fill={`url(#ball-${id})`} />
         <g stroke="#8b96a8" strokeWidth="0.6" opacity="0.6">
-          <circle r="22" fill="none" />
-          <ellipse rx="22" ry="7" fill="none" />
-          <ellipse rx="22" ry="14" fill="none" />
-          <ellipse rx="7" ry="22" fill="none" />
-          <ellipse rx="14" ry="22" fill="none" />
+          <circle r={crowd ? 34 : 22} fill="none" />
+          <ellipse rx={crowd ? 34 : 22} ry={crowd ? 10 : 7} fill="none" />
+          <ellipse rx={crowd ? 34 : 22} ry={crowd ? 21 : 14} fill="none" />
+          <ellipse rx={crowd ? 10 : 7} ry={crowd ? 34 : 22} fill="none" />
+          <ellipse rx={crowd ? 21 : 14} ry={crowd ? 34 : 22} fill="none" />
         </g>
-        <circle cx="-8" cy="-8" r="3.5" fill="#fff" opacity="0.9" />
-        <circle cx="7" cy="5" r="2" fill="#fff" opacity="0.7" />
+        <circle cx={crowd ? -12 : -8} cy={crowd ? -12 : -8} r={crowd ? 5 : 3.5} fill="#fff" opacity="0.9" />
+        <circle cx={crowd ? 10 : 7} cy={crowd ? 8 : 5} r={crowd ? 3 : 2} fill="#fff" opacity="0.7" />
       </g>
 
       {/* destellos */}

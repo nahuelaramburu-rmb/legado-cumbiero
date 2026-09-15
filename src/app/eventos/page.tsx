@@ -2,6 +2,7 @@ import Link from "next/link";
 import * as db from "@/lib/db";
 import { TopNav } from "@/components/TopNav";
 import { EventCard } from "@/components/EventCard";
+import { IconSearch } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -91,8 +92,8 @@ export default async function EventosPage({
               ))}
             </select>
           </div>
-          <button type="submit" className="btn-primary">
-            🔍 Buscar
+          <button type="submit" className="btn-primary gap-1.5">
+            <IconSearch size={16} /> Buscar
           </button>
         </form>
 

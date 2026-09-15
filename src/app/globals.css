@@ -67,6 +67,29 @@ body {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%);
 }
 
+/* Inputs de la barra de búsqueda: tema oscuro nativo + todo el campo clickeable
+   para abrir el date-picker (el ícono de calendario que se ve es el nuestro). */
+input[type="date"] {
+  color-scheme: dark;
+  position: relative;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+select {
+  color-scheme: dark;
+}
+select option {
+  background-color: #0b0710;
+  color: #fff6e9;
+}
+
 .hero-bg {
   background-image: radial-gradient(circle at 25% 20%, rgba(255, 46, 147, 0.45), transparent 45%),
     radial-gradient(circle at 85% 15%, rgba(34, 225, 225, 0.3), transparent 45%),
