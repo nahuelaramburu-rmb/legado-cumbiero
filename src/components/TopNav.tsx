@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { MobileMenu } from "@/components/MobileMenu";
 import { NavLinks } from "@/components/NavLinks";
 import { IconSearch, IconUser } from "@/components/icons";
@@ -10,61 +7,25 @@ import { IconSearch, IconUser } from "@/components/icons";
 export function TopNav({
   tenantName,
   tenantSlug,
-  variant = "default",
+  showBrand = true,
 }: {
   tenantName?: string;
   tenantSlug?: string;
-  /** "hero": flota transparente sobre la foto del hero (solo home), como en el boceto de marca. */
-  variant?: "default" | "hero";
+  /** false: oculta el isologo chico (la home lo reemplaza por el isologo grande del hero). */
+  showBrand?: boolean;
 }) {
-  const isHero = variant === "hero";
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    if (!isHero) return;
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isHero]);
-
-  const solid = !isHero || scrolled;
-
   return (
     <header
-      className={`inset-x-0 top-0 transition-colors duration-300 ${
-        isHero ? "fixed z-30" : "sticky z-20"
-      } ${
-        solid
-          ? "border-b border-white/10 bg-cumbia-night/90 backdrop-blur-md"
-          : "border-b border-transparent bg-gradient-to-b from-black/70 via-black/25 to-transparent"
+      className={`sticky top-0 z-20 border-b border-white/10 backdrop-blur-md ${
+        showBrand ? "bg-cumbia-night/80" : "bg-black"
       }`}
     >
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
-        <Link href="/" className="relative flex shrink-0 items-center gap-2">
-          <span className={`flex items-center gap-2 transition-opacity duration-300 ${solid ? "opacity-100" : "opacity-0"}`}>
-            <Image src="/logo.png" alt="Legado Cumbiero" width={40} height={40} className="rounded-lg" />
-            <span className="hidden font-black tracking-tight text-cumbia-cream sm:inline">
-              Legado <span className="text-cumbia-yellow">Cumbiero</span>
-            </span>
+        <Link href="/" className={`flex shrink-0 items-center gap-2 ${showBrand ? "" : "invisible"}`}>
+          <Image src="/logo.png" alt="Legado Cumbiero" width={40} height={40} className="rounded-lg" />
+          <span className="hidden font-black tracking-tight text-cumbia-cream sm:inline">
+            Legado <span className="text-cumbia-yellow">Cumbiero</span>
           </span>
-
-          {isHero && (
-            <span
-              className={`pointer-events-none absolute left-0 top-full w-20 transition-opacity duration-300 sm:w-32 lg:w-44 xl:w-52 ${
-                solid ? "opacity-0" : "opacity-100"
-              }`}
-            >
-              <Image
-                src="/logo-badge.png"
-                alt="Legado Cumbiero"
-                width={1254}
-                height={1254}
-                priority
-                className="h-auto w-full drop-shadow-[0_10px_26px_rgba(0,0,0,0.65)]"
-              />
-            </span>
-          )}
         </Link>
 
         <NavLinks />

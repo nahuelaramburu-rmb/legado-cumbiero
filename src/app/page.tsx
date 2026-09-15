@@ -14,9 +14,13 @@ export default async function HomePage() {
 
   return (
     <>
-      <TopNav variant="hero" />
+      <TopNav showBrand={false} />
       <main>
         <section className="relative overflow-hidden border-b border-white/10 bg-black">
+          <div className="pointer-events-none absolute left-4 top-0 z-20 w-28 drop-shadow-[0_10px_26px_rgba(0,0,0,0.65)] sm:left-6 sm:w-40 lg:w-56 xl:w-64">
+            <Image src="/logo-badge.png" alt="Legado Cumbiero" width={1254} height={1254} className="h-auto w-full" priority />
+          </div>
+
           <div className="relative flex h-[380px] flex-col justify-end overflow-hidden sm:h-[440px] lg:h-[500px]">
             <Image
               src="/hero-banner.png"
