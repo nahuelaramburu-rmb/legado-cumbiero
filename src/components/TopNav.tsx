@@ -7,14 +7,16 @@ import { IconSearch, IconUser } from "@/components/icons";
 export function TopNav({
   tenantName,
   tenantSlug,
+  showBrand = true,
 }: {
   tenantName?: string;
   tenantSlug?: string;
+  showBrand?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-20 border-b border-white/10 bg-cumbia-night/80 backdrop-blur-md">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className={`flex shrink-0 items-center gap-2 ${showBrand ? "" : "invisible"}`}>
           <Image src="/logo.png" alt="Legado Cumbiero" width={40} height={40} className="rounded-lg" />
           <span className="hidden font-black tracking-tight text-cumbia-cream sm:inline">
             Legado <span className="text-cumbia-yellow">Cumbiero</span>

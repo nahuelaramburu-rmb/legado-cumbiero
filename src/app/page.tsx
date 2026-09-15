@@ -14,9 +14,13 @@ export default async function HomePage() {
 
   return (
     <>
-      <TopNav />
+      <TopNav showBrand={false} />
       <main>
         <section className="relative overflow-hidden border-b border-white/10 bg-black">
+          <div className="pointer-events-none absolute left-4 top-0 z-20 w-28 drop-shadow-[0_10px_26px_rgba(0,0,0,0.65)] sm:left-6 sm:w-40 lg:w-56 xl:w-64">
+            <Image src="/logo-badge.png" alt="Legado Cumbiero" width={1254} height={1254} className="h-auto w-full" priority />
+          </div>
+
           <div className="relative flex h-[380px] flex-col justify-end overflow-hidden sm:h-[440px] lg:h-[500px]">
             <Image
               src="/hero-banner.png"
@@ -27,14 +31,6 @@ export default async function HomePage() {
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-
-            <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-8">
-              <h1 className="sr-only">La cumbia de siempre, en la fiesta de hoy</h1>
-              <p className="max-w-xl text-cumbia-cream/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
-                Legado Cumbiero conecta boliches: entradas, listas de invitados, usuarios
-                y line-ups — cada local con su propia identidad, todos en un solo lugar.
-              </p>
-            </div>
           </div>
 
           {/* barra de búsqueda flotante, se superpone al borde inferior del hero */}
