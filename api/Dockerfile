@@ -25,7 +25,13 @@ ENV PORT=3000
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/scripts ./scripts
 COPY package.json ./
+
+# tsx + argon2 (deps de prisma/seed.ts y scripts/migrate-sqlite-to-postgres.ts)
+# para poder correrlos dentro del contenedor ya desplegado, igual que hace
+# el Dockerfile de Next.js con el seed de scripts/seed.ts.
+RUN npm install --no-save tsx
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
