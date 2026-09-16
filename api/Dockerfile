@@ -31,7 +31,11 @@ COPY package.json ./
 # tsx + argon2 (deps de prisma/seed.ts y scripts/migrate-sqlite-to-postgres.ts)
 # para poder correrlos dentro del contenedor ya desplegado, igual que hace
 # el Dockerfile de Next.js con el seed de scripts/seed.ts.
-RUN npm install --no-save tsx
+# --include=dev es necesario: con NODE_ENV=production ya seteado arriba,
+# un "npm install" sin ese flag instala y en el mismo paso poda tsx de
+# vuelta por tratarlo como devDependency (queda "changed 1 package" en el
+# log pero el binario nunca sobrevive en la imagen final).
+RUN npm install --no-save --include=dev tsx
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
