@@ -5,6 +5,16 @@ Primera versión (MVP) de la plataforma multi-tenant para boliches: cada local
 shows, lista de invitados, reservas de entradas y un panel maestro que ve
 todos los tenants.
 
+## ⚠️ Migración en curso: backend NestJS + PostgreSQL
+
+Se está migrando el modelo de datos y sumando login/roles reales en un
+servicio nuevo (`api/`, NestJS + PostgreSQL) — ver `api/README.md` para el
+detalle completo (stack, roles/permisos, endpoints, flujo de auth). **Esta
+app Next.js todavía usa `src/lib/db.ts` (SQLite) para todo** — el cutover a
+la nueva API (login/registro, páginas protegidas, reemplazo de `db.ts` en
+cada página) es la próxima etapa. El plan completo de la migración vive en
+`C:\Users\usuario\.claude\plans\squishy-munching-newell.md`.
+
 ## Stack
 
 - **Next.js 15** (App Router) + **React 18** + **TypeScript**
@@ -106,15 +116,18 @@ archivo de base de datos (aislamiento lógico, no físico).
 
 ## Qué falta para producción (a propósito fuera del alcance de esta v1)
 
-- **Autenticación y roles reales** — hoy el panel de cada tenant y el panel
-  maestro son de acceso libre (sin login). Es el primer paso lógico para la
-  v2: login por tenant, roles admin/staff, y proteger `/master`.
+- **Autenticación y roles reales** — 🚧 en curso, ver `api/README.md`. El
+  backend (NestJS + Postgres, 4 roles: SUPER_ADMIN/TENANT_ADMIN/
+  TENANT_STAFF/CUSTOMER, con permisos granulares por categoría para el
+  staff) ya está escrito; falta el cutover del lado Next.js (`/login`,
+  `/registro`, proteger `/master` y `/[tenant]/admin`) y el despliegue.
 - **Pagos** — la reserva no cobra de verdad; falta integrar un medio de pago
   (Mercado Pago es una opción natural dado que ya lo estuviste evaluando).
-- **Multi-tenant a nivel infraestructura** — hoy todos los tenants comparten
-  una sola base SQLite; para escalar en serio conviene pasar a Postgres
-  (un esquema por tenant, o `tenantId` + Postgres con RLS) y desplegar en un
-  servidor real en vez de SQLite local.
+- **Multi-tenant a nivel infraestructura** — 🚧 en curso junto con lo
+  anterior: el nuevo backend (`api/`) ya modela todo en Postgres
+  (`tenantId` por fila); falta migrar los datos de producción desde SQLite
+  (script listo en `api/scripts/migrate-sqlite-to-postgres.ts`) y cortar el
+  Next.js actual sobre la nueva API.
 - **App multiplataforma** — esta v1 es web responsive. El mismo backend
   (Server Actions → se pueden exponer como API REST) sirve de base para una
   app nativa/Capacitor más adelante.
