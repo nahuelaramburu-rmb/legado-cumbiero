@@ -23,11 +23,10 @@ decisiones técnicas y etapas).
 
 ## Setup local
 
-Requiere Postgres corriendo (no hay uno embebido — en este entorno de
-desarrollo puntual no había Docker disponible, así que el código se
-verificó con TypeScript/build limpios pero **no se corrió en vivo contra
-una base real todavía**; la primera corrida real es contra el Postgres de
-la VPS, ver más abajo).
+Requiere Postgres corriendo (no hay uno embebido — esta máquina de
+desarrollo no tenía Docker, así que el código se escribió y verificó con
+TypeScript/build limpios, y la primera corrida en vivo se hizo directo
+contra el Postgres real de la VPS — ver "Verificado en producción" abajo).
 
 ```bash
 cd api
@@ -132,6 +131,31 @@ Prefijo global: `/api/v1`. Doc interactiva completa en `/api/v1/docs`
 | DELETE | `/tenants/:tenantSlug/staff/:userId` | TENANT_ADMIN o SUPER_ADMIN (desactiva, no borra) |
 | GET | `/health` | público (para Docker healthcheck / nginx) |
 
+## Verificado en producción (VPS)
+
+Levantado con `docker compose up -d postgres legado-api` en la VPS,
+migración aplicada (`prisma migrate deploy`) y seedeado. Probado en vivo con
+curl, todo funcionando como se diseñó:
+
+- Login de las 4 cuentas de ejemplo (SUPER_ADMIN, TENANT_ADMIN, TENANT_STAFF,
+  y un CUSTOMER recién registrado).
+- `GET /tenants/with-counts` (SUPER_ADMIN): 200 con token, 401 sin token.
+- Un `TENANT_ADMIN` (`romina@eltunel.com`) probó ver el staff de **otro**
+  tenant → 403 (`TenantScopeGuard`); el suyo propio → 200.
+- El `TENANT_STAFF` de ejemplo (permisos: sólo `GUEST_LIST_MANAGE` +
+  `RESERVATIONS_MANAGE`) intentó crear un show (`SHOWS_MANAGE`) → 403;
+  listó la lista de invitados → 200. Confirma que el recorte de permisos
+  por sub-categoría funciona.
+- `register` → `refresh` (rotación) → ambos devuelven tokens nuevos válidos.
+- `/api/v1/docs` (Swagger) responde 200.
+
+Un problema real que apareció y se corrigió en el camino: con
+`NODE_ENV=production` seteado en la imagen, `npm install tsx` instalaba y
+podaba el paquete en el mismo paso (npm lo trata como devDependency) — el
+binario nunca llegaba a la imagen final aunque el log de build no mostraba
+ningún error. Se resolvió con `npm install --no-save --include=dev tsx`
+(ver `Dockerfile`).
+
 ## Migración de datos (SQLite → Postgres)
 
 `scripts/migrate-sqlite-to-postgres.ts` — lee la SQLite vieja
@@ -164,13 +188,12 @@ SQL generado antes de aplicar.
 
 ## Qué falta (próximas etapas del plan)
 
-- [ ] Verificación en vivo contra un Postgres real (no se pudo correr
-      localmente en esta sesión por falta de Docker en la máquina de
-      desarrollo — la primera corrida real es en la VPS).
+- [x] Verificación en vivo contra un Postgres real — hecha en la VPS, ver
+      "Verificado en producción" arriba.
+- [x] `docker-compose.yml` (servicios `postgres` + `legado-api`),
+      `api/Dockerfile`.
 - [ ] Integración con Next.js: `/login`, `/registro`, sesión, cutover de
       `src/lib/db.ts` a esta API en todas las páginas.
-- [ ] `docker-compose.yml` (servicios `postgres` + `legado-api`),
-      `api/Dockerfile`.
 - [ ] Nginx + certbot para `api.legadocumbiero.rmbcorp.com` — requiere que
       el usuario cree el registro DNS A apuntando a la VPS primero.
 - [ ] Tests (unitarios de guards/servicios, e2e de auth).
