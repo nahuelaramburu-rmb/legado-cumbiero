@@ -83,8 +83,9 @@ desktop como en mobile:
 - `/boliches` — listado de boliches con buscador por nombre/ciudad.
 - `/[tenant]` — página pública de un boliche: header con su color,
   amenities, botón "Ver mapa" y sus próximos eventos (con cupo disponible).
-- `/[tenant]/reservar?show=...` — formulario de reserva. Checkout de
-  invitado, sin necesidad de estar logueado (paridad con el flujo original).
+- `/[tenant]/reservar?show=...` — formulario de reserva. **Protegido**:
+  requiere estar logueado (cualquier rol) — redirige a `/login` si no hay
+  sesión.
 - `/[tenant]/admin` — panel del boliche. **Protegido**: requiere ser
   `SUPER_ADMIN`, o `TENANT_ADMIN`/`TENANT_STAFF` de ese tenant. Cada sección
   (crear show, reservas, lista de invitados) se muestra u oculta según los
@@ -96,8 +97,8 @@ desktop como en mobile:
   existe en la API, falta la UI).
 - `/perfil` — datos de la cuenta logueada + accesos rápidos según rol +
   cerrar sesión.
-- `/reservas` — placeholder honesto: como las reservas son de invitado (sin
-  atarse a una cuenta), todavía no hay un historial que mostrar acá.
+- `/reservas` — **Protegido**: lista las reservas reales del usuario
+  logueado, en todos los boliches.
 
 ## Modelo de datos
 
@@ -111,23 +112,23 @@ fallback de rollback hasta el burn-in en producción.
 
 - **Pagos** — la reserva no cobra de verdad; falta integrar un medio de pago
   (Mercado Pago es una opción natural).
-- **Migrar datos reales** — la VPS corre hoy con datos de seed, no con los
-  del SQLite viejo de producción; falta correr
-  `api/scripts/migrate-sqlite-to-postgres.ts` contra ese volumen.
-- **Reservas atadas a cuenta** — hoy son siempre checkout de invitado
-  (`customerName`/`customerPhone` sueltos, sin `userId`); si se quiere un
-  historial real en `/reservas`, hay que sumar esa relación.
+- **Migrar datos reales** — la VPS está limpia (sin boliches de ejemplo,
+  sólo la cuenta `SUPER_ADMIN` real) esperando que se carguen boliches
+  reales desde `/master`. Si en algún momento hace falta recuperar los
+  datos del SQLite viejo de producción, el script está listo en
+  `api/scripts/migrate-sqlite-to-postgres.ts`.
 - **App multiplataforma** — esta v1 es web responsive. La API REST ya
   existe (`api/`) y sirve de base para una app nativa/Capacitor.
 - **Notificaciones** — confirmación de reserva por email/WhatsApp.
 - **Tests** — la API no tiene tests automatizados todavía (unitarios de
   guards/servicios, e2e de auth).
 
-## Datos de ejemplo cargados por el seed (`api/prisma/seed.ts`)
+## Datos de ejemplo (sólo desarrollo local — `api/prisma/seed.ts`)
 
-4 boliches (El Túnel, K'mina Club, El Galpón, Bunker), cada uno con su
-`TENANT_ADMIN`, shows, reservas y listas de invitados, más un `SUPER_ADMIN`
-de plataforma y un `TENANT_STAFF` de ejemplo con permisos parciales. Todas
-las cuentas de ejemplo comparten contraseña — ver la tabla completa en
-`api/README.md`. El seed se niega a correr si `NODE_ENV=production` (es
-sólo para desarrollo/demo).
+`npm run seed` dentro de `api/` carga 4 boliches (El Túnel, K'mina Club, El
+Galpón, Bunker) con su `TENANT_ADMIN`, shows, reservas y listas de
+invitados, más un `SUPER_ADMIN` de plataforma y un `TENANT_STAFF` de
+ejemplo con permisos parciales — ver la tabla completa en `api/README.md`.
+El seed se niega a correr si `NODE_ENV=production`, así que **nunca toca la
+base de la VPS** salvo que se lo invoque explícitamente overrideando esa
+variable (no recomendado en producción real).

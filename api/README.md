@@ -122,7 +122,8 @@ Prefijo global: `/api/v1`. Doc interactiva completa en `/api/v1/docs`
 | GET | `/shows/:id` | público |
 | GET | `/tenants/:tenantSlug/shows` | público |
 | POST | `/tenants/:tenantSlug/shows` | `SHOWS_MANAGE` |
-| POST | `/tenants/:tenantSlug/shows/:showId/reservations` | público (checkout sin login, paridad con el flujo actual) |
+| POST | `/tenants/:tenantSlug/shows/:showId/reservations` | autenticado (cualquier rol — reservar exige cuenta, ya no hay checkout de invitado) |
+| GET | `/reservations/me` | autenticado — reservas propias, todos los tenants |
 | GET | `/tenants/:tenantSlug/reservations` | `RESERVATIONS_MANAGE` |
 | GET/POST | `/tenants/:tenantSlug/shows/:showId/guests` | `GUEST_LIST_MANAGE` |
 | PATCH | `/tenants/:tenantSlug/guests/:guestId` | `GUEST_LIST_MANAGE` |
@@ -196,9 +197,18 @@ SQL generado antes de aplicar.
       `src/lib/db.ts` a esta API en todas las páginas — **en producción**,
       probado de punta a punta con Playwright contra
       `https://legadocumbiero.rmbcorp.com` (login de los 4 roles,
-      tenant-scoping, permisos granulares de staff, registro, logout,
-      reserva pública sin login). Ver el commit "Cutover de Next.js..." en
-      la raíz del repo.
+      tenant-scoping, permisos granulares de staff, registro, logout).
+      Ver el commit "Cutover de Next.js..." en la raíz del repo.
+- [x] Reservar ahora exige cuenta — se sacó el checkout de invitado.
+      `Reservation.userId` (nullable, por compatibilidad con datos
+      históricos migrados) queda seteado siempre en las reservas nuevas.
+      `GET /reservations/me` alimenta `/reservas` en el frontend. Probado
+      en producción: sin sesión, `/[tenant]/reservar` redirige a `/login`.
+- [x] Base de la VPS limpiada de datos de ejemplo — sólo queda la cuenta
+      `SUPER_ADMIN` real (`nahuelrmb4@gmail.com`) para cargar boliches
+      reales desde `/master`. El seed (`prisma/seed.ts`) sigue existiendo
+      para desarrollo local, pero se niega a correr con
+      `NODE_ENV=production`.
 - [ ] Nginx + certbot para `api.legadocumbiero.rmbcorp.com` — requiere que
       el usuario cree el registro DNS A apuntando a la VPS primero. Nota:
       Next.js habla con esta API por la red interna de Docker
@@ -206,11 +216,6 @@ SQL generado antes de aplicar.
       público **no es necesario** para que el sitio funcione — sólo hace
       falta si en el futuro un consumidor externo (app nativa, etc.) va a
       pegarle directo a la API.
-- [ ] Migrar los datos reales de producción (hoy la VPS corre con datos de
-      seed, no con los del SQLite viejo) — correr
-      `scripts/migrate-sqlite-to-postgres.ts` contra el volumen
-      `legado-cumbiero-data`, ver esa sección arriba. Pendiente porque el
-      SQLite de producción ya tenía datos de prueba, no reales.
 - [ ] Tests (unitarios de guards/servicios, e2e de auth).
 - [ ] Burn-in: usar la plataforma unos días antes de borrar
       `src/lib/db.ts` y el volumen SQLite viejo (quedan como fallback de
