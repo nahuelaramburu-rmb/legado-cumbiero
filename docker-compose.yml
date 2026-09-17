@@ -22,8 +22,10 @@ services:
     volumes:
       - legado-cumbiero-data:/app/data
       # Compartido con legado-api: la API escribe los logos/portadas subidos
-      # ahí, Next los sirve directo como archivos estáticos en /uploads/...
-      - legado-uploads:/app/public/uploads
+      # ahí; Next los sirve vía el Route Handler de src/app/uploads/[...path]
+      # (NO puede ser public/: en standalone el manifiesto de estáticos se
+      # arma en build time, así que un archivo agregado en runtime 404ea).
+      - legado-uploads:/app/uploads
     # Si tu nginx NO es del patrón nginx-proxy (por ejemplo nginx directo en
     # el host, o un nginx dockerizado con conf.d montado a mano), exponé el
     # puerto acá y apuntá el server block de nginx a 127.0.0.1:3050:
