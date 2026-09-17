@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { PermissionKey, Role } from '@prisma/client';
 import { Public } from '../common/decorators/public.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { TenantScopeGuard } from '../common/guards/tenant-scope.guard';
-import { TenantsService } from './tenants.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
-import { PermissionKey } from '@prisma/client';
+import { UpdateTenantStatusDto } from './dto/update-tenant-status.dto';
+import { TenantsService } from './tenants.service';
 
 @ApiTags('tenants')
 @Controller('tenants')
@@ -36,6 +36,12 @@ export class TenantsController {
     return this.tenantsService.findAllWithNextShow();
   }
 
+  /**
+   * Sin filtrar por activo a propósito: lo usan tanto la página pública
+   * (que sí debe ocultar un tenant desactivado — chequea `isActive` del
+   * lado de Next.js) como el panel de admin del propio boliche (que debe
+   * poder seguir viendo/operando aunque esté desactivado).
+   */
   @Public()
   @Get(':tenantSlug')
   findOne(@Param('tenantSlug') tenantSlug: string) {
@@ -55,5 +61,13 @@ export class TenantsController {
   @Patch(':tenantSlug')
   update(@Param('tenantSlug') tenantSlug: string, @Body() dto: UpdateTenantDto) {
     return this.tenantsService.update(tenantSlug, dto);
+  }
+
+  /** Activar/desactivar todo el boliche — sólo SUPER_ADMIN (no el propio admin del boliche). */
+  @Roles(Role.SUPER_ADMIN)
+  @UseGuards(RolesGuard)
+  @Patch(':tenantSlug/status')
+  setActive(@Param('tenantSlug') tenantSlug: string, @Body() dto: UpdateTenantStatusDto) {
+    return this.tenantsService.setActive(tenantSlug, dto.isActive);
   }
 }

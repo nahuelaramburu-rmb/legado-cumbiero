@@ -7,9 +7,10 @@ export class CreateTenantDto {
   name!: string;
 
   @IsString()
-  @MinLength(2)
-  @MaxLength(80)
-  city!: string;
+  provinceId!: string;
+
+  @IsString()
+  cityId!: string;
 
   @IsOptional()
   @IsString()

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { apiGet, apiGetOrNull } from "@/lib/api-client";
 import type { GuestEntry, Reservation, ShowWithAvailability, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
-import { addGuestAction, createShowAction, updateGuestStatusAction } from "@/lib/actions";
+import { addGuestAction, createShowAction, setShowActiveAction, updateGuestStatusAction } from "@/lib/actions";
 import { getAccessToken, requireRole } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -129,7 +129,7 @@ export default async function TenantAdminPage({
           const showGuests = guestsByShow.get(show.id) ?? [];
           return (
             <section key={show.id} className="mb-10">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex items-center justify-between gap-4">
                 <h3 className="text-lg font-semibold text-cumbia-cream">
                   {show.title} ·{" "}
                   <span className="text-cumbia-cream/50">
@@ -138,10 +138,28 @@ export default async function TenantAdminPage({
                       month: "2-digit",
                     }).format(new Date(show.date))}
                   </span>
+                  {!show.isActive && (
+                    <span className="badge ml-2 bg-red-500/20 text-red-300">Desactivado</span>
+                  )}
                 </h3>
-                <span className="text-xs text-cumbia-cream/50">
-                  Line-up: {show.lineup.map((l) => l.artist.name).join(", ") || "—"}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-cumbia-cream/50">
+                    Line-up: {show.lineup.map((l) => l.artist.name).join(", ") || "—"}
+                  </span>
+                  {canManageShows && (
+                    <form action={setShowActiveAction}>
+                      <input type="hidden" name="tenantSlug" value={tenant.slug} />
+                      <input type="hidden" name="showId" value={show.id} />
+                      <input type="hidden" name="isActive" value={(!show.isActive).toString()} />
+                      <button
+                        type="submit"
+                        className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-cumbia-cream/70 hover:bg-white/10"
+                      >
+                        {show.isActive ? "Desactivar" : "Activar"}
+                      </button>
+                    </form>
+                  )}
+                </div>
               </div>
 
               <div className="grid gap-5 lg:grid-cols-2">

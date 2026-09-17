@@ -16,8 +16,9 @@ export default async function TenantPage({
 }) {
   const { tenant: tenantSlug } = await params;
   const tenantData = await apiGetOrNull<Tenant>(`/tenants/${tenantSlug}`);
-  if (!tenantData) notFound();
-  const shows = await apiGet<ShowWithAvailability[]>(`/tenants/${tenantSlug}/shows`);
+  if (!tenantData || !tenantData.isActive) notFound();
+  const allShows = await apiGet<ShowWithAvailability[]>(`/tenants/${tenantSlug}/shows`);
+  const shows = allShows.filter((s) => s.isActive);
   const tenant = { ...tenantData, shows };
 
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

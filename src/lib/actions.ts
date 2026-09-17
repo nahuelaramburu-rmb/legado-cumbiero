@@ -101,25 +101,18 @@ export async function createShowAction(formData: FormData) {
   revalidatePath(`/${tenantSlug}/admin`);
 }
 
-export async function createTenantAction(formData: FormData) {
-  const name = String(formData.get("name") || "").trim();
-  const city = String(formData.get("city") || "").trim();
-  const description = String(formData.get("description") || "").trim();
-  const accentColor = String(formData.get("accentColor") || "#E9376F");
-  const amenities = String(formData.get("amenities") || "")
-    .split(",")
-    .map((a) => a.trim())
-    .filter(Boolean);
-
-  if (!name || !city) throw new Error("Nombre y ciudad son obligatorios");
+export async function setShowActiveAction(formData: FormData) {
+  const tenantSlug = String(formData.get("tenantSlug"));
+  const showId = String(formData.get("showId"));
+  const isActive = String(formData.get("isActive")) === "true";
 
   const accessToken = await getAccessToken();
   try {
-    await apiPost("/tenants", { name, city, description, accentColor, amenities }, accessToken ?? undefined);
+    await apiPatch(`/tenants/${tenantSlug}/shows/${showId}`, { isActive }, accessToken ?? undefined);
   } catch (err) {
-    throw new Error(apiErrorMessage(err, "No se pudo crear el boliche"));
+    throw new Error(apiErrorMessage(err, "No se pudo cambiar el estado del show"));
   }
 
-  revalidatePath("/");
-  revalidatePath("/master");
+  revalidatePath(`/${tenantSlug}`);
+  revalidatePath(`/${tenantSlug}/admin`);
 }

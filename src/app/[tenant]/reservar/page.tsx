@@ -22,10 +22,10 @@ export default async function ReservarPage({
   if (!session) redirect(`/login?redirectTo=/${tenantSlug}/reservar${showId ? `?show=${showId}` : ""}`);
 
   const tenant = await apiGetOrNull<Tenant>(`/tenants/${tenantSlug}`);
-  if (!tenant) notFound();
+  if (!tenant || !tenant.isActive) notFound();
 
   const show = showId ? await apiGetOrNull<Show>(`/shows/${showId}`) : null;
-  if (!show) notFound();
+  if (!show || !show.isActive) notFound();
 
   const accessToken = await getAccessToken();
   const me = await apiGet<PublicUser>("/auth/me", accessToken ?? undefined);

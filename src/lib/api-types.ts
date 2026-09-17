@@ -25,9 +25,12 @@ export interface Tenant {
   slug: string;
   name: string;
   city: string;
+  provinceId: string | null;
+  cityId: string | null;
   description: string;
   accentColor: string;
   amenities: string[];
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -61,6 +64,7 @@ export interface Show {
   date: string;
   capacity: number;
   ticketPrice: number;
+  isActive: boolean;
   lineup: LineupEntry[];
 }
 
@@ -106,4 +110,19 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   refreshTokenExpiresAt: string;
+}
+
+export interface City {
+  id: string;
+  name: string;
+}
+
+export interface Province {
+  id: string;
+  name: string;
+  cities: City[];
+}
+
+export interface LocationsResponse {
+  provinces: Province[];
 }
