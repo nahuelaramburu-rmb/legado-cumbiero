@@ -19,6 +19,15 @@ export class GuestListService {
     });
   }
 
+  /** Todos los invitados del tenant (todos los shows) — para el panel de admin. */
+  async listForTenant(tenantSlug: string) {
+    const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
+    return this.prisma.guestListEntry.findMany({
+      where: { tenantId: tenant.id },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async create(tenantSlug: string, showId: string, dto: CreateGuestDto) {
     const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
     const show = await this.prisma.show.findFirst({ where: { id: showId, tenantId: tenant.id } });

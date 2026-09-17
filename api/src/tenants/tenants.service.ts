@@ -13,6 +13,21 @@ export class TenantsService {
     return this.prisma.tenant.findMany({ orderBy: { name: 'asc' } });
   }
 
+  /** Cada tenant + su próximo show (a lo sumo 1) — para la home y /boliches. */
+  findAllWithNextShow() {
+    return this.prisma.tenant.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        shows: {
+          where: { date: { gte: new Date() } },
+          orderBy: { date: 'asc' },
+          take: 1,
+          include: { lineup: { include: { artist: true } } },
+        },
+      },
+    });
+  }
+
   async findAllWithCounts() {
     const tenants = await this.prisma.tenant.findMany({ orderBy: { createdAt: 'desc' } });
     return Promise.all(

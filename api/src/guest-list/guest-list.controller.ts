@@ -18,6 +18,11 @@ import { GuestListService } from './guest-list.service';
 export class GuestListController {
   constructor(private readonly guestListService: GuestListService) {}
 
+  @Get('guests')
+  listAll(@Param('tenantSlug') tenantSlug: string) {
+    return this.guestListService.listForTenant(tenantSlug);
+  }
+
   @Get('shows/:showId/guests')
   list(@Param('tenantSlug') tenantSlug: string, @Param('showId') showId: string) {
     return this.guestListService.listForShow(tenantSlug, showId);

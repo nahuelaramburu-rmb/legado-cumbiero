@@ -31,6 +31,12 @@ export class TenantsController {
   }
 
   @Public()
+  @Get('with-next-show')
+  findAllWithNextShow() {
+    return this.tenantsService.findAllWithNextShow();
+  }
+
+  @Public()
   @Get(':tenantSlug')
   findOne(@Param('tenantSlug') tenantSlug: string) {
     return this.tenantsService.findBySlugOrThrow(tenantSlug);

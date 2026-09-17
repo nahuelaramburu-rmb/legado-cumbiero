@@ -30,13 +30,27 @@ export class ShowsService {
     return show;
   }
 
+  /**
+   * Listado público: sin reservas/nombres de clientes, pero sí el total de
+   * entradas ya vendidas por show (reservedCount) para poder mostrar cupo
+   * disponible sin exponer quién reservó.
+   */
   async listByTenant(tenantSlug: string) {
     const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
-    return this.prisma.show.findMany({
+    const shows = await this.prisma.show.findMany({
       where: { tenantId: tenant.id },
       orderBy: { date: 'asc' },
       include: LINEUP_INCLUDE,
     });
+
+    const sums = await this.prisma.reservation.groupBy({
+      by: ['showId'],
+      where: { tenantId: tenant.id, status: 'confirmada' },
+      _sum: { quantity: true },
+    });
+    const reservedByShow = new Map(sums.map((s) => [s.showId, s._sum.quantity ?? 0]));
+
+    return shows.map((show) => ({ ...show, reservedCount: reservedByShow.get(show.id) ?? 0 }));
   }
 
   async create(tenantSlug: string, dto: CreateShowDto) {
