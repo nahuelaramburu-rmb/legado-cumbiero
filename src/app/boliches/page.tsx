@@ -1,4 +1,5 @@
-import * as db from "@/lib/db";
+import { apiGet } from "@/lib/api-client";
+import type { TenantWithShows } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { TenantCard } from "@/components/TenantCard";
 
@@ -10,7 +11,7 @@ export default async function BolichesPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  let tenants = db.listTenantsWithNextShow();
+  let tenants = await apiGet<TenantWithShows[]>("/tenants/with-next-show");
   if (q) {
     const needle = q.toLowerCase();
     tenants = tenants.filter(

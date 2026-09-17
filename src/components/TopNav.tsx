@@ -3,8 +3,9 @@ import Link from "next/link";
 import { MobileMenu } from "@/components/MobileMenu";
 import { NavLinks } from "@/components/NavLinks";
 import { IconSearch, IconUser } from "@/components/icons";
+import { getSession } from "@/lib/session";
 
-export function TopNav({
+export async function TopNav({
   tenantName,
   tenantSlug,
   showBrand = true,
@@ -14,6 +15,8 @@ export function TopNav({
   /** false: oculta el isologo chico (la home lo reemplaza por el isologo grande del hero). */
   showBrand?: boolean;
 }) {
+  const session = await getSession();
+
   return (
     <header
       className={`sticky top-0 z-20 border-b border-white/10 backdrop-blur-md ${
@@ -50,15 +53,17 @@ export function TopNav({
             <IconSearch size={18} />
           </Link>
           <Link
-            href="/perfil"
-            aria-label="Perfil"
+            href={session ? "/perfil" : "/login"}
+            aria-label={session ? "Perfil" : "Ingresar"}
             className="hidden h-9 w-9 place-items-center rounded-full border border-white/15 text-white hover:border-cumbia-pink hover:text-cumbia-pink md:grid"
           >
             <IconUser size={18} />
           </Link>
-          <Link href="/master" className="hidden text-sm text-cumbia-cream/50 hover:text-white sm:inline">
-            Panel maestro
-          </Link>
+          {session?.role === "SUPER_ADMIN" && (
+            <Link href="/master" className="hidden text-sm text-cumbia-cream/50 hover:text-white sm:inline">
+              Panel maestro
+            </Link>
+          )}
           <MobileMenu />
         </div>
       </div>

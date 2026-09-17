@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import * as db from "@/lib/db";
+import { apiGetOrNull } from "@/lib/api-client";
+import type { Show, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { createReservationAction } from "@/lib/actions";
@@ -16,10 +17,10 @@ export default async function ReservarPage({
   const { tenant: tenantSlug } = await params;
   const { show: showId } = await searchParams;
 
-  const tenant = db.getTenantBySlug(tenantSlug);
+  const tenant = await apiGetOrNull<Tenant>(`/tenants/${tenantSlug}`);
   if (!tenant) notFound();
 
-  const show = showId ? db.getShowWithLineup(showId) : null;
+  const show = showId ? await apiGetOrNull<Show>(`/shows/${showId}`) : null;
   if (!show) notFound();
 
   return (
@@ -35,8 +36,9 @@ export default async function ReservarPage({
             weekday: "long",
             day: "numeric",
             month: "long",
-          }).format(show.date)}{" "}
-          · {new Intl.DateTimeFormat("es-AR", { hour: "2-digit", minute: "2-digit" }).format(show.date)} hs ·{" "}
+          }).format(new Date(show.date))}{" "}
+          ·{" "}
+          {new Intl.DateTimeFormat("es-AR", { hour: "2-digit", minute: "2-digit" }).format(new Date(show.date))} hs ·{" "}
           {show.lineup.map((l) => l.artist.name).join(", ")}
         </p>
 

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import * as db from "@/lib/db";
+import { apiGet, apiGetOrNull } from "@/lib/api-client";
+import type { ShowWithAvailability, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { DiscoScene } from "@/components/DiscoScene";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -14,8 +15,10 @@ export default async function TenantPage({
   params: Promise<{ tenant: string }>;
 }) {
   const { tenant: tenantSlug } = await params;
-  const tenant = db.getTenantWithShows(tenantSlug, { withReservations: true });
-  if (!tenant) notFound();
+  const tenantData = await apiGetOrNull<Tenant>(`/tenants/${tenantSlug}`);
+  if (!tenantData) notFound();
+  const shows = await apiGet<ShowWithAvailability[]>(`/tenants/${tenantSlug}/shows`);
+  const tenant = { ...tenantData, shows };
 
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${tenant.name} ${tenant.city}`
@@ -82,10 +85,7 @@ export default async function TenantPage({
               </p>
             )}
             {tenant.shows.map((show) => {
-              const sold = show.reservations
-                .filter((r) => r.status === "confirmada")
-                .reduce((acc, r) => acc + r.quantity, 0);
-              const remaining = Math.max(show.capacity - sold, 0);
+              const remaining = Math.max(show.capacity - show.reservedCount, 0);
               const genre = show.lineup[0]?.artist.genre || "Cumbia";
               return (
                 <div key={show.id} className="card p-6 sm:flex sm:items-center sm:justify-between">
@@ -96,7 +96,7 @@ export default async function TenantPage({
                           weekday: "short",
                           day: "numeric",
                           month: "short",
-                        }).format(show.date)}
+                        }).format(new Date(show.date))}
                       </p>
                       <span className="chip">{genre}</span>
                     </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Show, Tenant } from "@/lib/db";
+import type { Show, Tenant } from "@/lib/api-types";
 import { DiscoScene } from "@/components/DiscoScene";
 import { IconMapPin } from "@/components/icons";
 
@@ -18,6 +18,7 @@ function contrastText(hex: string) {
 export function EventCard({ show, tenant, big = false }: { show: Show; tenant: Tenant; big?: boolean }) {
   const genre = show.lineup[0]?.artist.genre || "Cumbia";
   const textColor = contrastText(tenant.accentColor);
+  const date = new Date(show.date);
 
   return (
     <div className="card flex flex-col overflow-hidden transition hover:border-white/30">
@@ -29,9 +30,9 @@ export function EventCard({ show, tenant, big = false }: { show: Show; tenant: T
           className="date-pill absolute left-3 top-3 z-10"
           style={{ backgroundColor: tenant.accentColor, color: textColor }}
         >
-          <span>{WEEKDAYS[show.date.getDay()]}</span>
-          <span className="text-base">{show.date.getDate()}</span>
-          <span>{MONTHS[show.date.getMonth()]}</span>
+          <span>{WEEKDAYS[date.getDay()]}</span>
+          <span className="text-base">{date.getDate()}</span>
+          <span>{MONTHS[date.getMonth()]}</span>
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">

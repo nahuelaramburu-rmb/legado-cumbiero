@@ -1,12 +1,16 @@
 import Link from "next/link";
-import * as db from "@/lib/db";
+import { apiGet } from "@/lib/api-client";
+import type { TenantWithCounts } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { createTenantAction } from "@/lib/actions";
+import { getAccessToken, requireRole } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function MasterPage() {
-  const tenants = db.listTenantsWithCounts();
+  await requireRole(["SUPER_ADMIN"]);
+  const accessToken = await getAccessToken();
+  const tenants = await apiGet<TenantWithCounts[]>("/tenants/with-counts", accessToken ?? undefined);
 
   return (
     <>

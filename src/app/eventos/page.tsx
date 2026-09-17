@@ -1,5 +1,6 @@
 import Link from "next/link";
-import * as db from "@/lib/db";
+import { apiGet } from "@/lib/api-client";
+import type { ShowWithTenant, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { EventCard } from "@/components/EventCard";
 import { IconSearch } from "@/components/icons";
@@ -18,11 +19,15 @@ export default async function EventosPage({
   searchParams: Promise<{ fecha?: string; tenant?: string; rango?: string }>;
 }) {
   const { fecha, tenant, rango } = await searchParams;
-  const tenants = db.listTenantsWithNextShow();
 
-  let upcoming = db.listUpcomingShowsAll({ tenantSlug: tenant || undefined });
+  const [tenants, allUpcoming] = await Promise.all([
+    apiGet<Tenant[]>("/tenants"),
+    apiGet<ShowWithTenant[]>(`/shows/upcoming${tenant ? `?tenantSlug=${encodeURIComponent(tenant)}` : ""}`),
+  ]);
+
+  let upcoming = allUpcoming;
   if (fecha) {
-    upcoming = upcoming.filter((u) => u.show.date.toISOString().slice(0, 10) === fecha);
+    upcoming = upcoming.filter((show) => show.date.slice(0, 10) === fecha);
   }
   if (rango && rango !== "todos") {
     const now = new Date();
@@ -30,7 +35,7 @@ export default async function EventosPage({
     if (rango === "hoy") end.setHours(23, 59, 59, 999);
     if (rango === "semana") end.setDate(end.getDate() + 7);
     if (rango === "mes") end.setMonth(end.getMonth() + 1);
-    upcoming = upcoming.filter((u) => u.show.date <= end);
+    upcoming = upcoming.filter((show) => new Date(show.date) <= end);
   }
 
   const chipHref = (r: string) => {
@@ -101,8 +106,8 @@ export default async function EventosPage({
           <p className="card p-6 text-cumbia-cream/60">No hay eventos que coincidan con la búsqueda.</p>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map(({ show, tenant: t }) => (
-              <EventCard key={show.id} show={show} tenant={t} big />
+            {upcoming.map((show) => (
+              <EventCard key={show.id} show={show} tenant={show.tenant} big />
             ))}
           </div>
         )}

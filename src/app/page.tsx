@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import * as db from "@/lib/db";
+import { apiGet } from "@/lib/api-client";
+import type { ShowWithTenant, TenantWithShows } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { EventCard } from "@/components/EventCard";
 import { TenantCard } from "@/components/TenantCard";
@@ -9,8 +10,10 @@ import { IconCalendar, IconChevronRight, IconMapPin, IconSearch } from "@/compon
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const upcoming = db.listUpcomingShowsAll({ limit: 4 });
-  const tenants = db.listTenantsWithNextShow();
+  const [upcoming, tenants] = await Promise.all([
+    apiGet<ShowWithTenant[]>("/shows/upcoming?limit=4"),
+    apiGet<TenantWithShows[]>("/tenants/with-next-show"),
+  ]);
 
   return (
     <>
@@ -101,8 +104,8 @@ export default async function HomePage() {
             <p className="card p-6 text-cumbia-cream/60">Todavía no hay eventos cargados.</p>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {upcoming.map(({ show, tenant }) => (
-                <EventCard key={show.id} show={show} tenant={tenant} />
+              {upcoming.map((show) => (
+                <EventCard key={show.id} show={show} tenant={show.tenant} />
               ))}
             </div>
           )}

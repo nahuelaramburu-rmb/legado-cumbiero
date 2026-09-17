@@ -2,7 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as db from "@/lib/db";
+import { apiPatch, apiPost, ApiError } from "@/lib/api-client";
+import { getAccessToken } from "@/lib/session";
+
+function apiErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof ApiError && typeof err.body === "object" && err.body && "message" in err.body) {
+    const msg = (err.body as { message: unknown }).message;
+    return typeof msg === "string" ? msg : fallback;
+  }
+  return fallback;
+}
 
 export async function createReservationAction(formData: FormData) {
   const tenantSlug = String(formData.get("tenantSlug"));
@@ -15,16 +24,15 @@ export async function createReservationAction(formData: FormData) {
     throw new Error("Nombre y WhatsApp son obligatorios");
   }
 
-  const tenant = db.getTenantBySlug(tenantSlug);
-  if (!tenant) throw new Error("Boliche no encontrado");
-
-  db.createReservation({
-    tenantId: tenant.id,
-    showId,
-    customerName,
-    customerPhone,
-    quantity,
-  });
+  try {
+    await apiPost(`/tenants/${tenantSlug}/shows/${showId}/reservations`, {
+      customerName,
+      customerPhone,
+      quantity,
+    });
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo confirmar la reserva"));
+  }
 
   revalidatePath(`/${tenantSlug}`);
   revalidatePath(`/${tenantSlug}/admin`);
@@ -39,10 +47,12 @@ export async function addGuestAction(formData: FormData) {
 
   if (!name) throw new Error("Falta el nombre del invitado");
 
-  const tenant = db.getTenantBySlug(tenantSlug);
-  if (!tenant) throw new Error("Boliche no encontrado");
-
-  db.createGuest({ tenantId: tenant.id, showId, name, plusOnes });
+  const accessToken = await getAccessToken();
+  try {
+    await apiPost(`/tenants/${tenantSlug}/shows/${showId}/guests`, { name, plusOnes }, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo agregar el invitado"));
+  }
 
   revalidatePath(`/${tenantSlug}/admin`);
 }
@@ -52,7 +62,12 @@ export async function updateGuestStatusAction(formData: FormData) {
   const guestId = String(formData.get("guestId"));
   const status = String(formData.get("status"));
 
-  db.updateGuestStatus(guestId, status);
+  const accessToken = await getAccessToken();
+  try {
+    await apiPatch(`/tenants/${tenantSlug}/guests/${guestId}`, { status }, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo actualizar el invitado"));
+  }
 
   revalidatePath(`/${tenantSlug}/admin`);
 }
@@ -70,17 +85,16 @@ export async function createShowAction(formData: FormData) {
 
   if (!title || !dateStr) throw new Error("Título y fecha son obligatorios");
 
-  const tenant = db.getTenantBySlug(tenantSlug);
-  if (!tenant) throw new Error("Boliche no encontrado");
-
-  db.createShowWithArtists({
-    tenantId: tenant.id,
-    title,
-    date: new Date(dateStr),
-    capacity,
-    ticketPrice,
-    artistNames,
-  });
+  const accessToken = await getAccessToken();
+  try {
+    await apiPost(
+      `/tenants/${tenantSlug}/shows`,
+      { title, date: new Date(dateStr).toISOString(), capacity, ticketPrice, artistNames },
+      accessToken ?? undefined,
+    );
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo crear el show"));
+  }
 
   revalidatePath(`/${tenantSlug}`);
   revalidatePath(`/${tenantSlug}/admin`);
@@ -98,7 +112,12 @@ export async function createTenantAction(formData: FormData) {
 
   if (!name || !city) throw new Error("Nombre y ciudad son obligatorios");
 
-  db.createTenant({ name, city, description, accentColor, amenities });
+  const accessToken = await getAccessToken();
+  try {
+    await apiPost("/tenants", { name, city, description, accentColor, amenities }, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo crear el boliche"));
+  }
 
   revalidatePath("/");
   revalidatePath("/master");

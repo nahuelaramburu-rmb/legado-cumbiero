@@ -9,6 +9,7 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "jose": "^6.2.12",
     "next": "^15.3.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Tenant } from "@/lib/db";
+import type { Tenant } from "@/lib/api-types";
 import { DiscoScene } from "@/components/DiscoScene";
 import { IconArrowRight, IconMapPin } from "@/components/icons";
 

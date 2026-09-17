@@ -3,8 +3,15 @@ services:
     build: .
     container_name: legado-cumbiero
     restart: unless-stopped
+    depends_on:
+      - legado-api
     environment:
       - NODE_ENV=production
+      # Login/roles: esta app le habla a legado-api por la red interna de
+      # Docker (nunca por internet) y verifica los JWT que esa API emite —
+      # necesita el mismo secret. Ver api/README.md "Flujo de auth".
+      - API_INTERNAL_URL=http://legado-api:3000/api/v1
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       # Si tu VPS usa el patrón nginx-proxy + acme-companion (nginx-proxy /
       # letsencrypt-nginx-proxy-companion), descomentá estas 4 líneas y
       # conectá este servicio a la red de ese proxy (ver networks abajo):
