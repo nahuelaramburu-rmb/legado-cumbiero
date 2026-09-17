@@ -30,7 +30,15 @@ export default async function TenantPage({
       <TopNav tenantName={tenant.name} tenantSlug={tenant.slug} />
       <main>
         <div className="relative flex h-56 items-end overflow-hidden bg-black sm:h-64">
-          <DiscoScene tint={tenant.accentColor} variant="hero" />
+          {tenant.coverImageUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={tenant.coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/40" />
+            </>
+          ) : (
+            <DiscoScene tint={tenant.accentColor} variant="hero" />
+          )}
 
           {/* back + favorito, estilo mobile del mockup */}
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4 md:hidden">

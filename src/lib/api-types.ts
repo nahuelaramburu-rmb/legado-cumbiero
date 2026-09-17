@@ -30,6 +30,8 @@ export interface Tenant {
   description: string;
   accentColor: string;
   amenities: string[];
+  logoUrl: string | null;
+  coverImageUrl: string | null;
   isActive: boolean;
   createdAt: string;
 }

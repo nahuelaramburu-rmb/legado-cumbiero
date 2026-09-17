@@ -1,9 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Tenant } from '@prisma/client';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { slugify } from '../common/slugify';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
+
+const UPLOADS_ROOT = path.join(process.cwd(), 'uploads');
+const ALLOWED_IMAGE_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
 
 @Injectable()
 export class TenantsService {
@@ -114,5 +123,43 @@ export class TenantsService {
   async setActive(slug: string, isActive: boolean): Promise<Tenant> {
     await this.findBySlugOrThrow(slug);
     return this.prisma.tenant.update({ where: { slug }, data: { isActive } });
+  }
+
+  /** Logo (cuadrado, usado en cards/listados) y/o foto de portada (hero de su página pública). */
+  async updateImages(
+    slug: string,
+    files: { logo?: Express.Multer.File[]; cover?: Express.Multer.File[] },
+  ): Promise<Tenant> {
+    const tenant = await this.findBySlugOrThrow(slug);
+
+    const data: { logoUrl?: string; coverImageUrl?: string } = {};
+    if (files.logo?.[0]) data.logoUrl = await this.saveTenantImage(tenant.id, 'logo', files.logo[0], tenant.logoUrl);
+    if (files.cover?.[0]) {
+      data.coverImageUrl = await this.saveTenantImage(tenant.id, 'cover', files.cover[0], tenant.coverImageUrl);
+    }
+    if (Object.keys(data).length === 0) throw new BadRequestException('No se recibió ninguna imagen');
+
+    return this.prisma.tenant.update({ where: { slug }, data });
+  }
+
+  private async saveTenantImage(
+    tenantId: string,
+    kind: 'logo' | 'cover',
+    file: Express.Multer.File,
+    previousUrl: string | null,
+  ): Promise<string> {
+    const ext = ALLOWED_IMAGE_MIME[file.mimetype];
+    if (!ext) throw new BadRequestException('Formato de imagen no soportado — usá JPG, PNG o WEBP');
+
+    const dir = path.join(UPLOADS_ROOT, 'tenants', tenantId);
+    await fs.mkdir(dir, { recursive: true });
+    const filename = `${kind}-${Date.now()}.${ext}`;
+    await fs.writeFile(path.join(dir, filename), file.buffer);
+
+    if (previousUrl) {
+      await fs.unlink(path.join(UPLOADS_ROOT, previousUrl.replace(/^\/uploads\//, ''))).catch(() => {});
+    }
+
+    return `/uploads/tenants/${tenantId}/${filename}`;
   }
 }

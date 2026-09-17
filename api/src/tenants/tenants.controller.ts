@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { PermissionKey, Role } from '@prisma/client';
+import { memoryStorage } from 'multer';
 import { Public } from '../common/decorators/public.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -11,6 +13,8 @@ import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { UpdateTenantStatusDto } from './dto/update-tenant-status.dto';
 import { TenantsService } from './tenants.service';
+
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024; // 8MB
 
 @ApiTags('tenants')
 @Controller('tenants')
@@ -69,5 +73,26 @@ export class TenantsController {
   @Patch(':tenantSlug/status')
   setActive(@Param('tenantSlug') tenantSlug: string, @Body() dto: UpdateTenantStatusDto) {
     return this.tenantsService.setActive(tenantSlug, dto.isActive);
+  }
+
+  /** Logo y/o foto de portada — multipart/form-data, campos "logo" y "cover". */
+  @Roles(Role.SUPER_ADMIN, Role.TENANT_ADMIN, Role.TENANT_STAFF)
+  @RequirePermission(PermissionKey.TENANT_SETTINGS_MANAGE)
+  @UseGuards(RolesGuard, TenantScopeGuard, PermissionsGuard)
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'logo', maxCount: 1 },
+        { name: 'cover', maxCount: 1 },
+      ],
+      { storage: memoryStorage(), limits: { fileSize: MAX_IMAGE_SIZE } },
+    ),
+  )
+  @Patch(':tenantSlug/images')
+  uploadImages(
+    @Param('tenantSlug') tenantSlug: string,
+    @UploadedFiles() files: { logo?: Express.Multer.File[]; cover?: Express.Multer.File[] },
+  ) {
+    return this.tenantsService.updateImages(tenantSlug, files);
   }
 }

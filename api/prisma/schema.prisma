@@ -55,6 +55,9 @@ model Tenant {
   description String   @default("")
   accentColor String   @default("#E9376F")
   amenities   String[] @default(["Bailable", "Bar"])
+  /// Ruta pública (/uploads/tenants/<id>/...) — null hasta que se suba una.
+  logoUrl       String?
+  coverImageUrl String?
   /// Desactivar = "borrar" reversible: desaparece de la app pública sin
   /// tocar sus shows/reservas/invitados/staff.
   isActive    Boolean  @default(true)

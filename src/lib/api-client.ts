@@ -54,6 +54,25 @@ export function apiPatch<T>(path: string, body?: unknown, accessToken?: string):
   return request<T>(path, { method: "PATCH", body, accessToken });
 }
 
+/** Como apiPatch, pero para multipart/form-data (subida de archivos) — sin Content-Type manual. */
+export async function apiPatchMultipart<T>(path: string, formData: FormData, accessToken?: string): Promise<T> {
+  const res = await fetch(`${API_INTERNAL_URL}${path}`, {
+    method: "PATCH",
+    headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
+    body: formData,
+    cache: "no-store",
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const data = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    throw new ApiError(res.status, data, typeof data?.message === "string" ? data.message : undefined);
+  }
+
+  return data as T;
+}
+
 export function apiDelete<T>(path: string, accessToken?: string): Promise<T> {
   return request<T>(path, { method: "DELETE", accessToken });
 }

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { apiGet, apiGetOrNull } from "@/lib/api-client";
 import type { LocationsResponse, Tenant } from "@/lib/api-types";
 import { LocationSelect } from "@/components/LocationSelect";
-import { setTenantActiveAction, updateTenantAction } from "@/lib/master-actions";
+import { setTenantActiveAction, updateTenantAction, updateTenantImagesAction } from "@/lib/master-actions";
 import { IconArrowLeft } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -94,6 +94,60 @@ export default async function EditBolichePage({
         <div className="flex justify-end border-t border-white/10 pt-6">
           <button type="submit" className="btn-primary px-8">
             Guardar cambios
+          </button>
+        </div>
+      </form>
+
+      <form
+        action={updateTenantImagesAction}
+        encType="multipart/form-data"
+        className="card mt-6 max-w-2xl space-y-6 p-6 sm:p-8"
+      >
+        <input type="hidden" name="tenantSlug" value={tenant.slug} />
+        <p className="font-medium text-cumbia-cream">Imágenes del boliche</p>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Logo (cuadrado)</label>
+            <p className="mb-2 text-xs text-cumbia-cream/40">Se usa en las tarjetas y listados del boliche.</p>
+            {tenant.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tenant.logoUrl}
+                alt="Logo actual"
+                className="mb-2 h-20 w-20 rounded-xl border border-white/10 object-cover"
+              />
+            )}
+            <input
+              type="file"
+              name="logo"
+              accept="image/jpeg,image/png,image/webp"
+              className="w-full text-sm text-cumbia-cream/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-cumbia-cream file:transition hover:file:bg-white/20"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Foto de portada</label>
+            <p className="mb-2 text-xs text-cumbia-cream/40">Se usa como fondo de la página pública del boliche.</p>
+            {tenant.coverImageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tenant.coverImageUrl}
+                alt="Portada actual"
+                className="mb-2 h-20 w-full rounded-xl border border-white/10 object-cover"
+              />
+            )}
+            <input
+              type="file"
+              name="cover"
+              accept="image/jpeg,image/png,image/webp"
+              className="w-full text-sm text-cumbia-cream/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-cumbia-cream file:transition hover:file:bg-white/20"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end border-t border-white/10 pt-6">
+          <button type="submit" className="btn-primary px-8">
+            Subir imágenes
           </button>
         </div>
       </form>

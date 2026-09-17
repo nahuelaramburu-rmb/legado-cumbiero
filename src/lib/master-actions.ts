@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { apiPatch, apiPost, ApiError } from "@/lib/api-client";
+import { apiPatch, apiPatchMultipart, apiPost, ApiError } from "@/lib/api-client";
 import { getAccessToken } from "@/lib/session";
 
 function apiErrorMessage(err: unknown, fallback: string): string {
@@ -73,6 +73,32 @@ export async function updateTenantAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/master/boliches");
+  revalidatePath(`/${tenantSlug}`);
+}
+
+export async function updateTenantImagesAction(formData: FormData) {
+  const tenantSlug = String(formData.get("tenantSlug"));
+  const logo = formData.get("logo");
+  const cover = formData.get("cover");
+
+  const hasLogo = logo instanceof File && logo.size > 0;
+  const hasCover = cover instanceof File && cover.size > 0;
+  if (!hasLogo && !hasCover) throw new Error("Elegí al menos una imagen para subir");
+
+  const upload = new FormData();
+  if (hasLogo) upload.set("logo", logo);
+  if (hasCover) upload.set("cover", cover);
+
+  const accessToken = await getAccessToken();
+  try {
+    await apiPatchMultipart(`/tenants/${tenantSlug}/images`, upload, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo subir la imagen"));
+  }
+
+  revalidatePath("/");
+  revalidatePath("/master/boliches");
+  revalidatePath(`/master/boliches/${tenantSlug}`);
   revalidatePath(`/${tenantSlug}`);
 }
 

@@ -21,6 +21,9 @@ services:
       # - LETSENCRYPT_EMAIL=admin@rmbcorp.com
     volumes:
       - legado-cumbiero-data:/app/data
+      # Compartido con legado-api: la API escribe los logos/portadas subidos
+      # ahí, Next los sirve directo como archivos estáticos en /uploads/...
+      - legado-uploads:/app/public/uploads
     # Si tu nginx NO es del patrón nginx-proxy (por ejemplo nginx directo en
     # el host, o un nginx dockerizado con conf.d montado a mano), exponé el
     # puerto acá y apuntá el server block de nginx a 127.0.0.1:3050:
@@ -68,12 +71,15 @@ services:
       - PORT=3000
     ports:
       - "127.0.0.1:3051:3000"
+    volumes:
+      - legado-uploads:/app/uploads
     networks:
       - default
 
 volumes:
   legado-cumbiero-data:
   legado-postgres-data:
+  legado-uploads:
 
 networks:
   default: {}

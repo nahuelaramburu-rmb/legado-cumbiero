@@ -7,7 +7,12 @@ export function TenantCard({ tenant, nextShowTitle }: { tenant: Tenant; nextShow
   return (
     <Link href={`/${tenant.slug}`} className="card group flex items-center gap-4 p-4 transition hover:border-white/30">
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-black">
-        <DiscoScene tint={tenant.accentColor} variant="card" />
+        {tenant.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <DiscoScene tint={tenant.accentColor} variant="card" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
