@@ -90,6 +90,28 @@ select option {
   color: #fff6e9;
 }
 
+/* Selector de color de marca (alta de boliche): swatch circular en vez del
+   rectángulo con borde cuadrado que trae el navegador por default. */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+input[type="color"]::-moz-color-swatch {
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
 .hero-bg {
   background-image: radial-gradient(circle at 25% 20%, rgba(255, 46, 147, 0.45), transparent 45%),
     radial-gradient(circle at 85% 15%, rgba(34, 225, 225, 0.3), transparent 45%),

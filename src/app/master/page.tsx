@@ -4,6 +4,7 @@ import type { TenantWithCounts } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { createTenantAction } from "@/lib/actions";
 import { getAccessToken, requireRole } from "@/lib/session";
+import { IconMapPin, IconPlus, IconSparkle } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -21,42 +22,77 @@ export default async function MasterPage() {
           Panel maestro — todos los boliches
         </h1>
 
-        <section className="mb-10">
-          <h2 className="mb-4 text-lg font-semibold text-cumbia-cream/90">
-            Dar de alta un nuevo boliche (tenant)
-          </h2>
-          <form action={createTenantAction} className="card grid gap-3 p-6 sm:grid-cols-2">
-            <input
-              name="name"
-              placeholder="Nombre del boliche"
-              required
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-magenta"
-            />
-            <input
-              name="city"
-              placeholder="Ciudad"
-              required
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-magenta"
-            />
-            <input
-              name="description"
-              placeholder="Descripción breve"
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-magenta sm:col-span-2"
-            />
-            <input
-              name="amenities"
-              placeholder="Amenities separados por coma (ej: Bailable, Bar, Estacionamiento)"
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-magenta sm:col-span-2"
-            />
-            <input
-              type="color"
-              name="accentColor"
-              defaultValue="#E9376F"
-              className="h-11 w-20 rounded-lg border border-white/10 bg-black/30"
-            />
-            <button type="submit" className="btn-primary">
-              Crear boliche
-            </button>
+        <section className="mb-12">
+          <div className="mb-4 flex items-center gap-2">
+            <IconSparkle size={16} className="text-cumbia-yellow" />
+            <h2 className="text-lg font-semibold text-cumbia-cream/90">
+              Dar de alta un nuevo boliche
+            </h2>
+          </div>
+
+          <form action={createTenantAction} className="card space-y-6 p-6 sm:p-8">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-sm text-cumbia-cream/70">Nombre del boliche</label>
+                <input
+                  name="name"
+                  required
+                  placeholder="Ej: El Túnel"
+                  className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm text-cumbia-cream/70">Ciudad</label>
+                <div className="relative">
+                  <IconMapPin size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cumbia-cream/40" />
+                  <input
+                    name="city"
+                    required
+                    placeholder="Ej: La Plata"
+                    className="w-full rounded-lg border border-white/10 bg-black/30 py-2.5 pl-10 pr-3.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm text-cumbia-cream/70">Descripción</label>
+              <textarea
+                name="description"
+                rows={2}
+                placeholder="Una frase que resuma la onda del lugar"
+                className="w-full resize-none rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm text-cumbia-cream/70">Amenities</label>
+              <input
+                name="amenities"
+                placeholder="Bailable, Bar, Estacionamiento"
+                className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+              />
+              <p className="mt-1.5 text-xs text-cumbia-cream/40">Separados por coma — aparecen como chips en la página del boliche.</p>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
+              <input
+                type="color"
+                name="accentColor"
+                defaultValue="#E9376F"
+                className="h-12 w-12 shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium text-cumbia-cream">Color de marca</p>
+                <p className="text-xs text-cumbia-cream/40">Tiñe los botones y acentos de la página pública del boliche.</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end border-t border-white/10 pt-6">
+              <button type="submit" className="btn-primary gap-2 px-8">
+                <IconPlus size={16} /> Crear boliche
+              </button>
+            </div>
           </form>
         </section>
 
