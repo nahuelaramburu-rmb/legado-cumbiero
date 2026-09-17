@@ -192,8 +192,26 @@ SQL generado antes de aplicar.
       "Verificado en producción" arriba.
 - [x] `docker-compose.yml` (servicios `postgres` + `legado-api`),
       `api/Dockerfile`.
-- [ ] Integración con Next.js: `/login`, `/registro`, sesión, cutover de
-      `src/lib/db.ts` a esta API en todas las páginas.
+- [x] Integración con Next.js: `/login`, `/registro`, sesión, cutover de
+      `src/lib/db.ts` a esta API en todas las páginas — **en producción**,
+      probado de punta a punta con Playwright contra
+      `https://legadocumbiero.rmbcorp.com` (login de los 4 roles,
+      tenant-scoping, permisos granulares de staff, registro, logout,
+      reserva pública sin login). Ver el commit "Cutover de Next.js..." en
+      la raíz del repo.
 - [ ] Nginx + certbot para `api.legadocumbiero.rmbcorp.com` — requiere que
-      el usuario cree el registro DNS A apuntando a la VPS primero.
+      el usuario cree el registro DNS A apuntando a la VPS primero. Nota:
+      Next.js habla con esta API por la red interna de Docker
+      (`API_INTERNAL_URL=http://legado-api:3000`), así que el subdominio
+      público **no es necesario** para que el sitio funcione — sólo hace
+      falta si en el futuro un consumidor externo (app nativa, etc.) va a
+      pegarle directo a la API.
+- [ ] Migrar los datos reales de producción (hoy la VPS corre con datos de
+      seed, no con los del SQLite viejo) — correr
+      `scripts/migrate-sqlite-to-postgres.ts` contra el volumen
+      `legado-cumbiero-data`, ver esa sección arriba. Pendiente porque el
+      SQLite de producción ya tenía datos de prueba, no reales.
 - [ ] Tests (unitarios de guards/servicios, e2e de auth).
+- [ ] Burn-in: usar la plataforma unos días antes de borrar
+      `src/lib/db.ts` y el volumen SQLite viejo (quedan como fallback de
+      rollback, ver el plan).
