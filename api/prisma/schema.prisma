@@ -73,6 +73,7 @@ model User {
 
   refreshTokens    RefreshToken[]
   staffPermissions StaffPermission[]
+  reservations     Reservation[]
 
   @@map("User")
 }
@@ -174,6 +175,11 @@ model Reservation {
   tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   showId        String
   show          Show              @relation(fields: [showId], references: [id], onDelete: Cascade)
+  /// Quién reservó. Nullable sólo por datos históricos migrados del checkout
+  /// de invitado viejo (sin cuenta) — el endpoint de creación actual siempre
+  /// lo completa, porque reservar ahora exige estar logueado.
+  userId        String?
+  user          User?             @relation(fields: [userId], references: [id])
   customerName  String
   customerPhone String
   quantity      Int               @default(1)
@@ -182,5 +188,6 @@ model Reservation {
 
   @@index([tenantId])
   @@index([showId])
+  @@index([userId])
   @@map("Reservation")
 }

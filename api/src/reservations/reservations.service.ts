@@ -10,7 +10,7 @@ export class ReservationsService {
     private readonly tenants: TenantsService,
   ) {}
 
-  async create(tenantSlug: string, showId: string, dto: CreateReservationDto) {
+  async create(tenantSlug: string, showId: string, userId: string, dto: CreateReservationDto) {
     const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
 
     const show = await this.prisma.show.findFirst({ where: { id: showId, tenantId: tenant.id } });
@@ -20,6 +20,7 @@ export class ReservationsService {
       data: {
         tenantId: tenant.id,
         showId,
+        userId,
         customerName: dto.customerName,
         customerPhone: dto.customerPhone,
         quantity: dto.quantity,
@@ -33,6 +34,18 @@ export class ReservationsService {
       where: { tenantId: tenant.id },
       orderBy: { createdAt: 'desc' },
       include: { show: { select: { id: true, title: true, date: true } } },
+    });
+  }
+
+  /** Reservas de un usuario, en todos los tenants — para "Mis reservas". */
+  async listByUser(userId: string) {
+    return this.prisma.reservation.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        show: { select: { id: true, title: true, date: true } },
+        tenant: { select: { slug: true, name: true, accentColor: true } },
+      },
     });
   }
 }

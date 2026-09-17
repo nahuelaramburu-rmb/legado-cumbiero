@@ -230,14 +230,29 @@ async function main() {
     genre: 'Cumbia/Cuarteto',
   });
 
+  // Reservar ahora requiere cuenta — se crean clientes de ejemplo para las
+  // reservas de muestra (contraseña: SEED_PASSWORD, igual que el resto).
+  const customerPasswordHash = await argon2.hash(SEED_PASSWORD, { type: argon2.argon2id });
+  const sampleCustomers = await Promise.all(
+    [
+      { name: 'Micaela Fernández', email: 'micaela.fernandez@example.com' },
+      { name: 'Julián Pérez', email: 'julian.perez@example.com' },
+      { name: 'Sofía Ríos', email: 'sofia.rios@example.com' },
+      { name: 'Bruno Alsina', email: 'bruno.alsina@example.com' },
+      { name: 'Nahuel Aramburu', email: 'nahuel.aramburu.cliente@example.com' },
+      { name: 'Marisa Ledesma', email: 'marisa.ledesma@example.com' },
+    ].map(({ name, email }) => prisma.user.create({ data: { name, email, passwordHash: customerPasswordHash, role: Role.CUSTOMER } })),
+  );
+  const [micaela, julian, sofia, brunoAlsina, nahuelCliente, marisa] = sampleCustomers;
+
   await prisma.reservation.createMany({
     data: [
-      { tenantId: elTunel.id, showId: show1.id, customerName: 'Micaela Fernández', customerPhone: '+54 221 555-0142', quantity: 2 },
-      { tenantId: elTunel.id, showId: show1.id, customerName: 'Julián Pérez', customerPhone: '+54 221 555-0198', quantity: 4 },
-      { tenantId: elTunel.id, showId: show2.id, customerName: 'Sofía Ríos', customerPhone: '+54 221 555-0177', quantity: 3 },
-      { tenantId: kmina.id, showId: show3.id, customerName: 'Bruno Alsina', customerPhone: '+54 221 555-0133', quantity: 2 },
-      { tenantId: elGalpon.id, showId: show4.id, customerName: 'Nahuel Aramburu', customerPhone: '+54 221 555-0111', quantity: 2 },
-      { tenantId: bunker.id, showId: show5.id, customerName: 'Marisa Ledesma', customerPhone: '+54 221 555-0155', quantity: 5 },
+      { tenantId: elTunel.id, showId: show1.id, userId: micaela.id, customerName: micaela.name, customerPhone: '+54 221 555-0142', quantity: 2 },
+      { tenantId: elTunel.id, showId: show1.id, userId: julian.id, customerName: julian.name, customerPhone: '+54 221 555-0198', quantity: 4 },
+      { tenantId: elTunel.id, showId: show2.id, userId: sofia.id, customerName: sofia.name, customerPhone: '+54 221 555-0177', quantity: 3 },
+      { tenantId: kmina.id, showId: show3.id, userId: brunoAlsina.id, customerName: brunoAlsina.name, customerPhone: '+54 221 555-0133', quantity: 2 },
+      { tenantId: elGalpon.id, showId: show4.id, userId: nahuelCliente.id, customerName: nahuelCliente.name, customerPhone: '+54 221 555-0111', quantity: 2 },
+      { tenantId: bunker.id, showId: show5.id, userId: marisa.id, customerName: marisa.name, customerPhone: '+54 221 555-0155', quantity: 5 },
     ],
   });
 

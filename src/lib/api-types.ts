@@ -91,12 +91,14 @@ export interface Reservation {
   id: string;
   tenantId: string;
   showId: string;
+  userId: string | null;
   customerName: string;
   customerPhone: string;
   quantity: number;
   status: ReservationStatus;
   createdAt: string;
   show?: { id: string; title: string; date: string };
+  tenant?: { slug: string; name: string; accentColor: string };
 }
 
 export interface AuthResponse {

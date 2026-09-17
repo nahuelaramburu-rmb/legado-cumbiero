@@ -24,12 +24,13 @@ export async function createReservationAction(formData: FormData) {
     throw new Error("Nombre y WhatsApp son obligatorios");
   }
 
+  const accessToken = await getAccessToken();
   try {
-    await apiPost(`/tenants/${tenantSlug}/shows/${showId}/reservations`, {
-      customerName,
-      customerPhone,
-      quantity,
-    });
+    await apiPost(
+      `/tenants/${tenantSlug}/shows/${showId}/reservations`,
+      { customerName, customerPhone, quantity },
+      accessToken ?? undefined,
+    );
   } catch (err) {
     throw new Error(apiErrorMessage(err, "No se pudo confirmar la reserva"));
   }

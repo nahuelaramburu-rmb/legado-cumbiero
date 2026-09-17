@@ -1,9 +1,10 @@
-import { notFound } from "next/navigation";
-import { apiGetOrNull } from "@/lib/api-client";
-import type { Show, Tenant } from "@/lib/api-types";
+import { notFound, redirect } from "next/navigation";
+import { apiGet, apiGetOrNull } from "@/lib/api-client";
+import type { PublicUser, Show, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { createReservationAction } from "@/lib/actions";
+import { getAccessToken, getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,17 @@ export default async function ReservarPage({
   const { tenant: tenantSlug } = await params;
   const { show: showId } = await searchParams;
 
+  const session = await getSession();
+  if (!session) redirect(`/login?redirectTo=/${tenantSlug}/reservar${showId ? `?show=${showId}` : ""}`);
+
   const tenant = await apiGetOrNull<Tenant>(`/tenants/${tenantSlug}`);
   if (!tenant) notFound();
 
   const show = showId ? await apiGetOrNull<Show>(`/shows/${showId}`) : null;
   if (!show) notFound();
+
+  const accessToken = await getAccessToken();
+  const me = await apiGet<PublicUser>("/auth/me", accessToken ?? undefined);
 
   return (
     <>
@@ -55,6 +62,7 @@ export default async function ReservarPage({
             <input
               name="customerName"
               required
+              defaultValue={me.name}
               placeholder="Tu nombre"
               className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-pink"
             />
