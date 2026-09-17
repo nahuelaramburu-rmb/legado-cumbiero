@@ -50,9 +50,18 @@ export default async function UsuariosPage() {
           <div>
             <label className="mb-1.5 block text-sm text-cumbia-cream/70">Nombre</label>
             <input
-              name="name"
+              name="firstName"
               required
-              placeholder="Nombre y apellido"
+              placeholder="Nombre"
+              className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Apellido</label>
+            <input
+              name="lastName"
+              required
+              placeholder="Apellido"
               className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
             />
           </div>
@@ -95,7 +104,7 @@ export default async function UsuariosPage() {
             <div key={u.id} className="card flex flex-wrap items-center justify-between gap-3 p-4">
               <div>
                 <p className="flex items-center gap-2 font-medium text-cumbia-cream">
-                  {u.name}
+                  {u.firstName} {u.lastName}
                   {!u.isActive && <span className="badge bg-red-500/20 text-xs text-red-300">Desactivado</span>}
                 </p>
                 <p className="text-sm text-cumbia-cream/50">{u.email}</p>

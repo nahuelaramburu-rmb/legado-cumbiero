@@ -27,7 +27,8 @@ async function createTenantWithAdmin(input: {
   description: string;
   accentColor: string;
   amenities: string[];
-  adminName: string;
+  adminFirstName: string;
+  adminLastName: string;
   adminEmail: string;
 }) {
   const slug = input.name
@@ -52,7 +53,8 @@ async function createTenantWithAdmin(input: {
   await prisma.user.create({
     data: {
       tenantId: tenant.id,
-      name: input.adminName,
+      firstName: input.adminFirstName,
+      lastName: input.adminLastName,
       email: input.adminEmail,
       passwordHash,
       role: Role.TENANT_ADMIN,
@@ -108,7 +110,8 @@ async function main() {
   const superAdminPasswordHash = await argon2.hash(SEED_PASSWORD, { type: argon2.argon2id });
   await prisma.user.create({
     data: {
-      name: 'Admin Plataforma',
+      firstName: 'Admin',
+      lastName: 'Plataforma',
       email: 'admin@legadocumbiero.com',
       passwordHash: superAdminPasswordHash,
       role: Role.SUPER_ADMIN,
@@ -122,7 +125,8 @@ async function main() {
       "El clásico de la cumbia, con toda la onda de los 90's y 2000's. Un boliche mítico, con la mejor música, ambiente y gente linda.",
     accentColor: '#FF2E93',
     amenities: ["Cumbia 90's/2000's", 'Bailable', 'Bar', 'Estacionamiento'],
-    adminName: 'Romina Gómez',
+    adminFirstName: 'Romina',
+    adminLastName: 'Gómez',
     adminEmail: 'romina@eltunel.com',
   });
 
@@ -132,7 +136,8 @@ async function main() {
     description: 'Cumbia total y reggaetón clásico, todos los viernes. El after de los sábados de La Plata.',
     accentColor: '#FFD400',
     amenities: ['Cumbia Total', 'Bailable', 'Bar'],
-    adminName: 'Diego Cabral',
+    adminFirstName: 'Diego',
+    adminLastName: 'Cabral',
     adminEmail: 'diego@kmina.com',
   });
 
@@ -142,7 +147,8 @@ async function main() {
     description: 'Cumbia sin límites: el salón más grande de la zona, shows en vivo todos los fines de semana.',
     accentColor: '#22E1E1',
     amenities: ['Cumbia sin límites', 'Bailable', 'Bar', 'Estacionamiento'],
-    adminName: 'Marisa Ledesma',
+    adminFirstName: 'Marisa',
+    adminLastName: 'Ledesma',
     adminEmail: 'marisa@elgalpon.com',
   });
 
@@ -152,7 +158,8 @@ async function main() {
     description: 'Cumbia y cuarteto en el boliche under de Ensenada. La fiesta de tu vida, todos los fines de semana.',
     accentColor: '#8B2FF2',
     amenities: ['Cumbia/Cuarteto', 'Bailable', 'Bar'],
-    adminName: 'Nahuel Torres',
+    adminFirstName: 'Nahuel',
+    adminLastName: 'Torres',
     adminEmail: 'nahuel@bunker.com',
   });
 
@@ -160,7 +167,8 @@ async function main() {
   await prisma.user.create({
     data: {
       tenantId: elTunel.id,
-      name: 'Bruno (staff puerta)',
+      firstName: 'Bruno',
+      lastName: 'Paredes',
       email: 'bruno@eltunel.com',
       passwordHash: await argon2.hash(SEED_PASSWORD, { type: argon2.argon2id }),
       role: Role.TENANT_STAFF,
@@ -235,24 +243,25 @@ async function main() {
   const customerPasswordHash = await argon2.hash(SEED_PASSWORD, { type: argon2.argon2id });
   const sampleCustomers = await Promise.all(
     [
-      { name: 'Micaela Fernández', email: 'micaela.fernandez@example.com' },
-      { name: 'Julián Pérez', email: 'julian.perez@example.com' },
-      { name: 'Sofía Ríos', email: 'sofia.rios@example.com' },
-      { name: 'Bruno Alsina', email: 'bruno.alsina@example.com' },
-      { name: 'Nahuel Aramburu', email: 'nahuel.aramburu.cliente@example.com' },
-      { name: 'Marisa Ledesma', email: 'marisa.ledesma@example.com' },
-    ].map(({ name, email }) => prisma.user.create({ data: { name, email, passwordHash: customerPasswordHash, role: Role.CUSTOMER } })),
+      { firstName: 'Micaela', lastName: 'Fernández', email: 'micaela.fernandez@example.com', phoneAreaCode: '221', phoneNumber: '5550142' },
+      { firstName: 'Julián', lastName: 'Pérez', email: 'julian.perez@example.com', phoneAreaCode: '221', phoneNumber: '5550198' },
+      { firstName: 'Sofía', lastName: 'Ríos', email: 'sofia.rios@example.com', phoneAreaCode: '221', phoneNumber: '5550177' },
+      { firstName: 'Bruno', lastName: 'Alsina', email: 'bruno.alsina@example.com', phoneAreaCode: '221', phoneNumber: '5550133' },
+      { firstName: 'Nahuel', lastName: 'Aramburu', email: 'nahuel.aramburu.cliente@example.com', phoneAreaCode: '221', phoneNumber: '5550111' },
+      { firstName: 'Marisa', lastName: 'Ledesma', email: 'marisa.ledesma@example.com', phoneAreaCode: '221', phoneNumber: '5550155' },
+    ].map((c) => prisma.user.create({ data: { ...c, passwordHash: customerPasswordHash, role: Role.CUSTOMER } })),
   );
   const [micaela, julian, sofia, brunoAlsina, nahuelCliente, marisa] = sampleCustomers;
+  const fullName = (u: { firstName: string; lastName: string }) => `${u.firstName} ${u.lastName}`;
 
   await prisma.reservation.createMany({
     data: [
-      { tenantId: elTunel.id, showId: show1.id, userId: micaela.id, customerName: micaela.name, customerPhone: '+54 221 555-0142', quantity: 2 },
-      { tenantId: elTunel.id, showId: show1.id, userId: julian.id, customerName: julian.name, customerPhone: '+54 221 555-0198', quantity: 4 },
-      { tenantId: elTunel.id, showId: show2.id, userId: sofia.id, customerName: sofia.name, customerPhone: '+54 221 555-0177', quantity: 3 },
-      { tenantId: kmina.id, showId: show3.id, userId: brunoAlsina.id, customerName: brunoAlsina.name, customerPhone: '+54 221 555-0133', quantity: 2 },
-      { tenantId: elGalpon.id, showId: show4.id, userId: nahuelCliente.id, customerName: nahuelCliente.name, customerPhone: '+54 221 555-0111', quantity: 2 },
-      { tenantId: bunker.id, showId: show5.id, userId: marisa.id, customerName: marisa.name, customerPhone: '+54 221 555-0155', quantity: 5 },
+      { tenantId: elTunel.id, showId: show1.id, userId: micaela.id, customerName: fullName(micaela), customerPhone: '+54 221 555-0142', quantity: 2 },
+      { tenantId: elTunel.id, showId: show1.id, userId: julian.id, customerName: fullName(julian), customerPhone: '+54 221 555-0198', quantity: 4 },
+      { tenantId: elTunel.id, showId: show2.id, userId: sofia.id, customerName: fullName(sofia), customerPhone: '+54 221 555-0177', quantity: 3 },
+      { tenantId: kmina.id, showId: show3.id, userId: brunoAlsina.id, customerName: fullName(brunoAlsina), customerPhone: '+54 221 555-0133', quantity: 2 },
+      { tenantId: elGalpon.id, showId: show4.id, userId: nahuelCliente.id, customerName: fullName(nahuelCliente), customerPhone: '+54 221 555-0111', quantity: 2 },
+      { tenantId: bunker.id, showId: show5.id, userId: marisa.id, customerName: fullName(marisa), customerPhone: '+54 221 555-0155', quantity: 5 },
     ],
   });
 

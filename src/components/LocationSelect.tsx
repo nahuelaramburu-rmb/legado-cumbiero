@@ -12,10 +12,13 @@ export function LocationSelect({
   provinces,
   defaultProvinceId,
   defaultCityId,
+  required = true,
 }: {
   provinces: Province[];
   defaultProvinceId?: string;
   defaultCityId?: string;
+  /** false: campos opcionales (ej. registro de cliente) — default true para no tocar los usos existentes. */
+  required?: boolean;
 }) {
   const [provinceId, setProvinceId] = useState(defaultProvinceId ?? "");
   const [cityId, setCityId] = useState(defaultCityId ?? "");
@@ -27,7 +30,7 @@ export function LocationSelect({
         <label className="mb-1.5 block text-sm text-cumbia-cream/70">Provincia</label>
         <select
           name="provinceId"
-          required
+          required={required}
           value={provinceId}
           onChange={(e) => {
             setProvinceId(e.target.value);
@@ -49,7 +52,7 @@ export function LocationSelect({
         <label className="mb-1.5 block text-sm text-cumbia-cream/70">Ciudad</label>
         <select
           name="cityId"
-          required
+          required={required}
           disabled={!provinceId}
           value={cityId}
           onChange={(e) => setCityId(e.target.value)}

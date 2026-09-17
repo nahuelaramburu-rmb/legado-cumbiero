@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { FavoritesModule } from './favorites/favorites.module';
 import { GuestListModule } from './guest-list/guest-list.module';
 import { HealthController } from './health/health.controller';
 import { LocationsModule } from './locations/locations.module';
@@ -27,6 +28,7 @@ import { UsersModule } from './users/users.module';
     ReservationsModule,
     GuestListModule,
     LocationsModule,
+    FavoritesModule,
   ],
   controllers: [HealthController],
   providers: [

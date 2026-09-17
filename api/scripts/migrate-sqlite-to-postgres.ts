@@ -84,7 +84,8 @@ async function main() {
       create: {
         id: u.id,
         tenantId: u.tenantId,
-        name: u.name,
+        firstName: u.name,
+        lastName: '-',
         email: u.email,
         passwordHash: await argon2.hash(randomUUID(), { type: argon2.argon2id }),
         role: Role.TENANT_ADMIN,

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { apiPatch, apiPost, ApiError } from "@/lib/api-client";
+import { apiDelete, apiPatch, apiPost, ApiError } from "@/lib/api-client";
 import { getAccessToken } from "@/lib/session";
 
 function apiErrorMessage(err: unknown, fallback: string): string {
@@ -115,4 +115,18 @@ export async function setShowActiveAction(formData: FormData) {
 
   revalidatePath(`/${tenantSlug}`);
   revalidatePath(`/${tenantSlug}/admin`);
+}
+
+export async function toggleFavoriteAction(tenantSlug: string, favorite: boolean) {
+  const accessToken = await getAccessToken();
+  if (!accessToken) throw new Error("No autenticado");
+
+  if (favorite) {
+    await apiPost(`/favorites/${tenantSlug}`, undefined, accessToken);
+  } else {
+    await apiDelete(`/favorites/${tenantSlug}`, accessToken);
+  }
+
+  revalidatePath(`/${tenantSlug}`);
+  revalidatePath("/perfil");
 }

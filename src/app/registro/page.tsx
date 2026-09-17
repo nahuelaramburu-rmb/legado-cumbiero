@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { TopNav } from "@/components/TopNav";
 import { RegisterForm } from "@/components/RegisterForm";
+import { apiGet } from "@/lib/api-client";
+import type { LocationsResponse } from "@/lib/api-types";
 import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +10,8 @@ export const dynamic = "force-dynamic";
 export default async function RegistroPage() {
   const session = await getSession();
   if (session) redirect("/");
+
+  const { provinces } = await apiGet<LocationsResponse>("/locations");
 
   return (
     <>
@@ -17,7 +21,7 @@ export default async function RegistroPage() {
         <p className="mb-8 text-sm text-cumbia-cream/60">
           Registrate para reservar entradas y guardar tus datos para la próxima.
         </p>
-        <RegisterForm />
+        <RegisterForm provinces={provinces} />
       </main>
     </>
   );

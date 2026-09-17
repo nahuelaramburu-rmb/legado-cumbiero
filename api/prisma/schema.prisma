@@ -68,6 +68,7 @@ model Tenant {
   shows        Show[]
   guestEntries GuestListEntry[]
   reservations Reservation[]
+  favoritedBy  Favorite[]
 
   @@index([provinceId])
   @@index([cityId])
@@ -79,6 +80,7 @@ model Province {
   name      String
   cities    City[]
   tenants   Tenant[]
+  users     User[]
   updatedAt DateTime @updatedAt
 
   @@map("Province")
@@ -90,6 +92,7 @@ model City {
   provinceId String
   province   Province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   tenants    Tenant[]
+  users      User[]
 
   @@index([provinceId])
   @@map("City")
@@ -99,9 +102,23 @@ model User {
   id           String   @id @default(uuid())
   tenantId     String?
   tenant       Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  name         String
+  firstName    String
+  lastName     String
   email        String   @unique
   passwordHash String
+  /// Sólo se usan hoy en el registro de CUSTOMER — cuentas de staff/admin
+  /// creadas desde los paneles no las piden (no aportan a reportes de
+  /// clientes) y quedan null.
+  phoneAreaCode String?
+  phoneNumber   String?
+  birthDate     DateTime? @db.Date
+  provinceId    String?
+  province      Province? @relation(fields: [provinceId], references: [id])
+  cityId        String?
+  cityRef       City?     @relation(fields: [cityId], references: [id])
+  /// Opt-in explícito para poder usar email/WhatsApp en campañas — false
+  /// por default, nunca se asume.
+  marketingOptIn Boolean @default(false)
   role         Role     @default(CUSTOMER)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -110,8 +127,26 @@ model User {
   refreshTokens    RefreshToken[]
   staffPermissions StaffPermission[]
   reservations     Reservation[]
+  favorites        Favorite[]
 
+  @@index([provinceId])
+  @@index([cityId])
   @@map("User")
+}
+
+/// Boliches marcados como favoritos por un CUSTOMER — alimenta "Tus
+/// favoritos" en /perfil.
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+  @@map("Favorite")
 }
 
 /// Refresh token opaco (no JWT): sólo se guarda el hash, nunca el valor

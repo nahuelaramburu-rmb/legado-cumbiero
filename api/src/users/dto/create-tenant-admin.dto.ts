@@ -6,8 +6,13 @@ export class CreateTenantAdminDto {
 
   @IsString()
   @MinLength(2)
-  @MaxLength(80)
-  name!: string;
+  @MaxLength(60)
+  firstName!: string;
+
+  @IsString()
+  @MinLength(2)
+  @MaxLength(60)
+  lastName!: string;
 
   @IsEmail()
   email!: string;

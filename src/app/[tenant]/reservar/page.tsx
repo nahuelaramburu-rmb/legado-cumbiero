@@ -29,6 +29,7 @@ export default async function ReservarPage({
 
   const accessToken = await getAccessToken();
   const me = await apiGet<PublicUser>("/auth/me", accessToken ?? undefined);
+  const defaultPhone = me.phoneAreaCode && me.phoneNumber ? `+54 ${me.phoneAreaCode} ${me.phoneNumber}` : undefined;
 
   return (
     <>
@@ -62,7 +63,7 @@ export default async function ReservarPage({
             <input
               name="customerName"
               required
-              defaultValue={me.name}
+              defaultValue={`${me.firstName} ${me.lastName}`}
               placeholder="Tu nombre"
               className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-pink"
             />
@@ -73,6 +74,7 @@ export default async function ReservarPage({
               type="tel"
               name="customerPhone"
               required
+              defaultValue={defaultPhone}
               placeholder="+54 221 1234567"
               className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-cumbia-cream outline-none focus:border-cumbia-pink"
             />

@@ -120,17 +120,22 @@ export async function setTenantActiveAction(formData: FormData) {
 
 export async function createTenantAdminAction(formData: FormData) {
   const tenantSlug = String(formData.get("tenantSlug") || "");
-  const name = String(formData.get("name") || "").trim();
+  const firstName = String(formData.get("firstName") || "").trim();
+  const lastName = String(formData.get("lastName") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
 
-  if (!tenantSlug || !name || !email || !password) {
+  if (!tenantSlug || !firstName || !lastName || !email || !password) {
     throw new Error("Todos los campos son obligatorios");
   }
 
   const accessToken = await getAccessToken();
   try {
-    await apiPost("/admin/users/tenant-admin", { tenantSlug, name, email, password }, accessToken ?? undefined);
+    await apiPost(
+      "/admin/users/tenant-admin",
+      { tenantSlug, firstName, lastName, email, password },
+      accessToken ?? undefined,
+    );
   } catch (err) {
     throw new Error(apiErrorMessage(err, "No se pudo crear el admin del boliche"));
   }

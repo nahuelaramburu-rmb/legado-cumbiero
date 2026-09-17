@@ -8,12 +8,53 @@ import type { Reservation } from "@/lib/api-types";
 
 export const dynamic = "force-dynamic";
 
+function ReservationCard({ r }: { r: Reservation }) {
+  return (
+    <div className="card flex items-center justify-between p-5">
+      <div>
+        <p className="font-semibold text-cumbia-cream">{r.show?.title}</p>
+        <p className="text-sm text-cumbia-cream/60">
+          {r.tenant?.name}
+          {r.show?.date && (
+            <>
+              {" · "}
+              {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(
+                new Date(r.show.date),
+              )}
+            </>
+          )}
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="badge bg-cumbia-magenta/20 text-cumbia-magenta">x{r.quantity}</span>
+        <span
+          className={`chip ${
+            r.status === "confirmada" ? "border-cumbia-cyan/60 text-cumbia-cyan" : "border-white/20 text-cumbia-cream/50"
+          }`}
+        >
+          {r.status === "confirmada" ? "Confirmada" : "Cancelada"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default async function ReservasPage() {
   const session = await getSession();
   if (!session) redirect("/login?redirectTo=/reservas");
 
   const accessToken = await getAccessToken();
   const reservations = await apiGet<Reservation[]>("/reservations/me", accessToken ?? undefined);
+
+  const now = Date.now();
+  const isUpcoming = (r: Reservation) => r.status === "confirmada" && r.show?.date && new Date(r.show.date).getTime() >= now;
+
+  const upcoming = reservations
+    .filter(isUpcoming)
+    .sort((a, b) => new Date(a.show!.date).getTime() - new Date(b.show!.date).getTime());
+  const history = reservations
+    .filter((r) => !isUpcoming(r))
+    .sort((a, b) => new Date(b.show?.date ?? b.createdAt).getTime() - new Date(a.show?.date ?? a.createdAt).getTime());
 
   return (
     <>
@@ -30,35 +71,32 @@ export default async function ReservasPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
-            {reservations.map((r) => (
-              <div key={r.id} className="card flex items-center justify-between p-5">
-                <div>
-                  <p className="font-semibold text-cumbia-cream">{r.show?.title}</p>
-                  <p className="text-sm text-cumbia-cream/60">
-                    {r.tenant?.name}
-                    {r.show?.date && (
-                      <>
-                        {" · "}
-                        {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(
-                          new Date(r.show.date),
-                        )}
-                      </>
-                    )}
-                  </p>
+          <div className="space-y-10">
+            <section>
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-cumbia-cream/60">
+                Próximos eventos
+              </h2>
+              {upcoming.length === 0 ? (
+                <p className="text-sm text-cumbia-cream/40">No tenés reservas para eventos próximos.</p>
+              ) : (
+                <div className="space-y-3">
+                  {upcoming.map((r) => (
+                    <ReservationCard key={r.id} r={r} />
+                  ))}
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="badge bg-cumbia-magenta/20 text-cumbia-magenta">x{r.quantity}</span>
-                  <span
-                    className={`chip ${
-                      r.status === "confirmada" ? "border-cumbia-cyan/60 text-cumbia-cyan" : "border-white/20 text-cumbia-cream/50"
-                    }`}
-                  >
-                    {r.status === "confirmada" ? "Confirmada" : "Cancelada"}
-                  </span>
+              )}
+            </section>
+
+            {history.length > 0 && (
+              <section>
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-cumbia-cream/60">Historial</h2>
+                <div className="space-y-3">
+                  {history.map((r) => (
+                    <ReservationCard key={r.id} r={r} />
+                  ))}
                 </div>
-              </div>
-            ))}
+              </section>
+            )}
           </div>
         )}
       </main>

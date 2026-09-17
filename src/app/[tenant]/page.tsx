@@ -5,7 +5,8 @@ import type { ShowWithAvailability, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { DiscoScene } from "@/components/DiscoScene";
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { IconArrowLeft, IconMapPin } from "@/components/icons";
+import { IconArrowLeft, IconHeart, IconMapPin } from "@/components/icons";
+import { getAccessToken, getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,14 @@ export default async function TenantPage({
   const allShows = await apiGet<ShowWithAvailability[]>(`/tenants/${tenantSlug}/shows`);
   const shows = allShows.filter((s) => s.isActive);
   const tenant = { ...tenantData, shows };
+
+  const session = await getSession();
+  let isFavorite = false;
+  if (session) {
+    const accessToken = await getAccessToken();
+    const res = await apiGet<{ favorited: boolean }>(`/favorites/${tenantSlug}/mine`, accessToken ?? undefined);
+    isFavorite = res.favorited;
+  }
 
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${tenant.name} ${tenant.city}`
@@ -49,7 +58,17 @@ export default async function TenantPage({
             >
               <IconArrowLeft size={18} />
             </Link>
-            <FavoriteButton />
+            {session ? (
+              <FavoriteButton tenantSlug={tenant.slug} initialFavorite={isFavorite} />
+            ) : (
+              <Link
+                href={`/login?redirectTo=/${tenant.slug}`}
+                aria-label="Iniciá sesión para guardar como favorito"
+                className="grid h-10 w-10 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm"
+              >
+                <IconHeart size={19} />
+              </Link>
+            )}
           </div>
 
           <span

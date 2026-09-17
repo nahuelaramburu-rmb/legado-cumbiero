@@ -43,16 +43,36 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
 }
 
 export async function registerAction(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
-  const name = String(formData.get("name") || "").trim();
+  const firstName = String(formData.get("firstName") || "").trim();
+  const lastName = String(formData.get("lastName") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
+  const phoneAreaCode = String(formData.get("phoneAreaCode") || "").trim();
+  const phoneNumber = String(formData.get("phoneNumber") || "").trim();
+  const birthDate = String(formData.get("birthDate") || "").trim();
+  const provinceId = String(formData.get("provinceId") || "").trim();
+  const cityId = String(formData.get("cityId") || "").trim();
+  const marketingOptIn = formData.get("marketingOptIn") === "on";
 
-  if (!name || !email || !password) return { error: "Completá todos los campos" };
+  if (!firstName || !lastName || !email || !password || !phoneAreaCode || !phoneNumber) {
+    return { error: "Completá nombre, apellido, email, teléfono y contraseña" };
+  }
   if (password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" };
 
   let auth: AuthResponse;
   try {
-    auth = await apiPost<AuthResponse>("/auth/register", { name, email, password });
+    auth = await apiPost<AuthResponse>("/auth/register", {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneAreaCode,
+      phoneNumber,
+      birthDate: birthDate || undefined,
+      provinceId: provinceId || undefined,
+      cityId: cityId || undefined,
+      marketingOptIn,
+    });
   } catch (err) {
     if (err instanceof ApiError && err.status === 409) return { error: "Ya existe una cuenta con ese email" };
     if (err instanceof ApiError && err.status === 400) return { error: "Revisá los datos ingresados" };

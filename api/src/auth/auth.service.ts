@@ -30,9 +30,16 @@ export class AuthService {
     const passwordHash = await argon2.hash(dto.password, { type: argon2.argon2id });
     return this.prisma.user.create({
       data: {
-        name: dto.name,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         email: dto.email,
         passwordHash,
+        phoneAreaCode: dto.phoneAreaCode,
+        phoneNumber: dto.phoneNumber,
+        birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
+        provinceId: dto.provinceId || undefined,
+        cityId: dto.cityId || undefined,
+        marketingOptIn: dto.marketingOptIn ?? false,
         role: Role.CUSTOMER,
       },
     });

@@ -10,12 +10,19 @@ export type PermissionKey = "SHOWS_MANAGE" | "RESERVATIONS_MANAGE" | "GUEST_LIST
 
 export interface PublicUser {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: Role;
   tenantId: string | null;
   tenantSlug: string | null;
   permissions: PermissionKey[];
+  phoneAreaCode: string | null;
+  phoneNumber: string | null;
+  birthDate: string | null;
+  provinceId: string | null;
+  cityId: string | null;
+  marketingOptIn: boolean;
   isActive: boolean;
   createdAt: string;
 }

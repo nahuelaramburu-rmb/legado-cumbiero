@@ -41,7 +41,8 @@ export class UsersService {
     const user = await this.prisma.user.create({
       data: {
         tenantId: tenant.id,
-        name: dto.name,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         email: dto.email,
         passwordHash,
         role: Role.TENANT_STAFF,
@@ -112,7 +113,8 @@ export class UsersService {
     const user = await this.prisma.user.create({
       data: {
         tenantId: tenant.id,
-        name: dto.name,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         email: dto.email,
         passwordHash,
         role: Role.TENANT_ADMIN,
