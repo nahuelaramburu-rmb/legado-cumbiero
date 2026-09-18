@@ -114,7 +114,7 @@ export function RegisterForm({ provinces }: { provinces: Province[] }) {
         <p className="mb-1 text-sm text-cumbia-cream/70">
           Dónde vivís <span className="text-cumbia-cream/40">(opcional)</span>
         </p>
-        <LocationSelect provinces={provinces} />
+        <LocationSelect provinces={provinces} required={false} />
       </div>
 
       <label className="flex items-start gap-2.5 text-sm text-cumbia-cream/70">
