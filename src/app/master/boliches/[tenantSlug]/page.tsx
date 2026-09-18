@@ -83,6 +83,62 @@ export default async function EditBolichePage({
           <p className="mt-1.5 text-xs text-cumbia-cream/40">Separados por coma — aparecen como chips en la página del boliche.</p>
         </div>
 
+        <div>
+          <label className="mb-1.5 block text-sm text-cumbia-cream/70">Dirección</label>
+          <input
+            name="address"
+            defaultValue={tenant.address ?? ""}
+            placeholder="Ej: Calle 50 N° 1234"
+            className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+          />
+          <p className="mt-1.5 text-xs text-cumbia-cream/40">Se usa para el link "Ver mapa" de la página pública.</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Teléfono / WhatsApp de contacto</label>
+            <input
+              name="contactPhone"
+              defaultValue={tenant.contactPhone ?? ""}
+              placeholder="+54 221 1234567"
+              className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Instagram</label>
+            <input
+              name="instagram"
+              defaultValue={tenant.instagram ?? ""}
+              placeholder="@boliche"
+              className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Horario</label>
+            <input
+              name="openingHours"
+              defaultValue={tenant.openingHours ?? ""}
+              placeholder="Vie-Sáb 23:00 a 06:00"
+              className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm text-cumbia-cream/70">Edad mínima</label>
+            <input
+              type="number"
+              name="minAge"
+              min={0}
+              max={99}
+              defaultValue={tenant.minAge ?? ""}
+              placeholder="18"
+              className="w-full rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5 text-cumbia-cream outline-none transition focus:border-cumbia-pink"
+            />
+          </div>
+        </div>
+
         <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
           <input type="color" name="accentColor" defaultValue={tenant.accentColor} className="h-12 w-12 shrink-0" />
           <div>

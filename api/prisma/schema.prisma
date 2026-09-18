@@ -58,6 +58,12 @@ model Tenant {
   /// Ruta pública (/uploads/tenants/<id>/...) — null hasta que se suba una.
   logoUrl       String?
   coverImageUrl String?
+  /// Info de contacto/operativa — todo opcional, se completa desde el panel.
+  address       String?
+  contactPhone  String?
+  instagram     String?
+  openingHours  String?
+  minAge        Int?
   /// Desactivar = "borrar" reversible: desaparece de la app pública sin
   /// tocar sus shows/reservas/invitados/staff.
   isActive    Boolean  @default(true)

@@ -13,7 +13,7 @@ function apiErrorMessage(err: unknown, fallback: string): string {
   return fallback;
 }
 
-export async function createTenantWithLocationAction(formData: FormData) {
+function readTenantFields(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   const provinceId = String(formData.get("provinceId") || "");
   const cityId = String(formData.get("cityId") || "");
@@ -23,18 +23,40 @@ export async function createTenantWithLocationAction(formData: FormData) {
     .split(",")
     .map((a) => a.trim())
     .filter(Boolean);
+  const address = String(formData.get("address") || "").trim();
+  const contactPhone = String(formData.get("contactPhone") || "").trim();
+  const instagram = String(formData.get("instagram") || "").trim();
+  const openingHours = String(formData.get("openingHours") || "").trim();
+  const minAgeRaw = String(formData.get("minAge") || "").trim();
 
   if (!name || !provinceId || !cityId) {
     throw new Error("Nombre, provincia y ciudad son obligatorios");
   }
 
+  return {
+    name,
+    provinceId,
+    cityId,
+    description,
+    accentColor,
+    amenities,
+    // "" en vez de undefined: así también sirve para BORRAR el campo al
+    // editar (updateTenantAction hace un PATCH parcial que sólo aplica
+    // los campos presentes en el body).
+    address,
+    contactPhone,
+    instagram,
+    openingHours,
+    minAge: minAgeRaw ? Number(minAgeRaw) : null,
+  };
+}
+
+export async function createTenantWithLocationAction(formData: FormData) {
+  const fields = readTenantFields(formData);
+
   const accessToken = await getAccessToken();
   try {
-    await apiPost(
-      "/tenants",
-      { name, provinceId, cityId, description, accentColor, amenities },
-      accessToken ?? undefined,
-    );
+    await apiPost("/tenants", fields, accessToken ?? undefined);
   } catch (err) {
     throw new Error(apiErrorMessage(err, "No se pudo crear el boliche"));
   }
@@ -46,27 +68,11 @@ export async function createTenantWithLocationAction(formData: FormData) {
 
 export async function updateTenantAction(formData: FormData) {
   const tenantSlug = String(formData.get("tenantSlug"));
-  const name = String(formData.get("name") || "").trim();
-  const provinceId = String(formData.get("provinceId") || "");
-  const cityId = String(formData.get("cityId") || "");
-  const description = String(formData.get("description") || "").trim();
-  const accentColor = String(formData.get("accentColor") || "#E9376F");
-  const amenities = String(formData.get("amenities") || "")
-    .split(",")
-    .map((a) => a.trim())
-    .filter(Boolean);
-
-  if (!name || !provinceId || !cityId) {
-    throw new Error("Nombre, provincia y ciudad son obligatorios");
-  }
+  const fields = readTenantFields(formData);
 
   const accessToken = await getAccessToken();
   try {
-    await apiPatch(
-      `/tenants/${tenantSlug}`,
-      { name, provinceId, cityId, description, accentColor, amenities },
-      accessToken ?? undefined,
-    );
+    await apiPatch(`/tenants/${tenantSlug}`, fields, accessToken ?? undefined);
   } catch (err) {
     throw new Error(apiErrorMessage(err, "No se pudo actualizar el boliche"));
   }

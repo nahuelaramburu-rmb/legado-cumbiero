@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ReservationStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { TenantsService } from '../tenants/tenants.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
@@ -34,6 +35,19 @@ export class ReservationsService {
       where: { tenantId: tenant.id },
       orderBy: { createdAt: 'desc' },
       include: { show: { select: { id: true, title: true, date: true } } },
+    });
+  }
+
+  async cancel(tenantSlug: string, reservationId: string) {
+    const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { id: reservationId, tenantId: tenant.id },
+    });
+    if (!reservation) throw new NotFoundException('Reserva no encontrada');
+
+    return this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: { status: ReservationStatus.cancelada },
     });
   }
 

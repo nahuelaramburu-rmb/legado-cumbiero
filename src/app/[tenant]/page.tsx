@@ -31,8 +31,11 @@ export default async function TenantPage({
   }
 
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${tenant.name} ${tenant.city}`
+    tenant.address ? `${tenant.address}, ${tenant.city}` : `${tenant.name} ${tenant.city}`
   )}`;
+  const instagramHref = tenant.instagram
+    ? `https://instagram.com/${tenant.instagram.replace(/^@/, "")}`
+    : null;
 
   return (
     <>
@@ -89,6 +92,34 @@ export default async function TenantPage({
 
         <div className="mx-auto max-w-6xl px-6 py-10">
           <p className="mb-4 max-w-2xl text-cumbia-cream/70">{tenant.description}</p>
+
+          {(tenant.address || tenant.openingHours || tenant.minAge || tenant.contactPhone || instagramHref) && (
+            <div className="mb-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-cumbia-cream/60">
+              {tenant.address && (
+                <span className="flex items-center gap-1.5">
+                  <IconMapPin size={14} className="text-white/60" /> {tenant.address}
+                </span>
+              )}
+              {tenant.openingHours && <span>{tenant.openingHours}</span>}
+              {typeof tenant.minAge === "number" && <span>+{tenant.minAge} años</span>}
+              {tenant.contactPhone && (
+                <a
+                  href={`https://wa.me/${tenant.contactPhone.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-cumbia-cream"
+                >
+                  {tenant.contactPhone}
+                </a>
+              )}
+              {instagramHref && (
+                <a href={instagramHref} target="_blank" rel="noreferrer" className="hover:text-cumbia-cream">
+                  {tenant.instagram}
+                </a>
+              )}
+            </div>
+          )}
+
           <div className="mb-10 flex flex-wrap gap-2">
             {tenant.amenities.map((a) => (
               <span key={a} className="chip">

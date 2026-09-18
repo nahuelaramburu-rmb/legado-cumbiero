@@ -1,8 +1,15 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiGet, apiGetOrNull } from "@/lib/api-client";
 import type { GuestEntry, Reservation, ShowWithAvailability, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
-import { addGuestAction, createShowAction, setShowActiveAction, updateGuestStatusAction } from "@/lib/actions";
+import {
+  addGuestAction,
+  cancelReservationAction,
+  createShowAction,
+  setShowActiveAction,
+  updateGuestStatusAction,
+} from "@/lib/actions";
 import { getAccessToken, requireRole } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -147,20 +154,37 @@ export default async function TenantAdminPage({
                     Line-up: {show.lineup.map((l) => l.artist.name).join(", ") || "—"}
                   </span>
                   {canManageShows && (
-                    <form action={setShowActiveAction}>
-                      <input type="hidden" name="tenantSlug" value={tenant.slug} />
-                      <input type="hidden" name="showId" value={show.id} />
-                      <input type="hidden" name="isActive" value={(!show.isActive).toString()} />
-                      <button
-                        type="submit"
+                    <>
+                      <Link
+                        href={`/${tenant.slug}/admin/shows/${show.id}`}
                         className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-cumbia-cream/70 hover:bg-white/10"
                       >
-                        {show.isActive ? "Desactivar" : "Activar"}
-                      </button>
-                    </form>
+                        Editar
+                      </Link>
+                      <form action={setShowActiveAction}>
+                        <input type="hidden" name="tenantSlug" value={tenant.slug} />
+                        <input type="hidden" name="showId" value={show.id} />
+                        <input type="hidden" name="isActive" value={(!show.isActive).toString()} />
+                        <button
+                          type="submit"
+                          className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-cumbia-cream/70 hover:bg-white/10"
+                        >
+                          {show.isActive ? "Desactivar" : "Activar"}
+                        </button>
+                      </form>
+                    </>
                   )}
                 </div>
               </div>
+
+              {canManageReservations && (
+                <p className="mb-3 -mt-2 text-xs text-cumbia-cream/50">
+                  {showReservations
+                    .filter((r) => r.status === "confirmada")
+                    .reduce((acc, r) => acc + r.quantity, 0)}{" "}
+                  / {show.capacity} entradas vendidas
+                </p>
+              )}
 
               <div className="grid gap-5 lg:grid-cols-2">
                 {canManageReservations && (
@@ -175,14 +199,34 @@ export default async function TenantAdminPage({
                       {showReservations.map((r) => (
                         <div
                           key={r.id}
-                          className="flex items-center justify-between rounded-lg bg-black/20 px-3 py-2 text-sm"
+                          className="flex items-center justify-between gap-2 rounded-lg bg-black/20 px-3 py-2 text-sm"
                         >
-                          <span>
+                          <span className={r.status === "cancelada" ? "text-cumbia-cream/40 line-through" : ""}>
                             {r.customerName} <span className="text-cumbia-cream/40">({r.customerPhone})</span>
                           </span>
-                          <span className="badge bg-cumbia-magenta/20 text-cumbia-magenta">
-                            x{r.quantity}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`badge ${
+                                r.status === "cancelada"
+                                  ? "bg-white/10 text-cumbia-cream/50"
+                                  : "bg-cumbia-magenta/20 text-cumbia-magenta"
+                              }`}
+                            >
+                              x{r.quantity}
+                            </span>
+                            {r.status === "confirmada" && (
+                              <form action={cancelReservationAction}>
+                                <input type="hidden" name="tenantSlug" value={tenant.slug} />
+                                <input type="hidden" name="reservationId" value={r.id} />
+                                <button
+                                  type="submit"
+                                  className="rounded-md border border-white/10 px-2 py-1 text-xs text-cumbia-cream/60 hover:border-red-500/40 hover:text-red-300"
+                                >
+                                  Cancelar
+                                </button>
+                              </form>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>

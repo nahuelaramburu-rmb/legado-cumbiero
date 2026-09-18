@@ -117,6 +117,60 @@ export async function setShowActiveAction(formData: FormData) {
   revalidatePath(`/${tenantSlug}/admin`);
 }
 
+export async function updateShowDetailsAction(formData: FormData) {
+  const tenantSlug = String(formData.get("tenantSlug"));
+  const showId = String(formData.get("showId"));
+  const title = String(formData.get("title") || "").trim();
+  const dateStr = String(formData.get("date") || "");
+  const capacity = Math.max(1, Number(formData.get("capacity") || 200));
+  const ticketPrice = Math.max(0, Number(formData.get("ticketPrice") || 0));
+  const genre = String(formData.get("genre") || "").trim();
+  const artistNames = String(formData.get("artists") || "")
+    .split(",")
+    .map((a) => a.trim())
+    .filter(Boolean);
+
+  if (!title || !dateStr) throw new Error("Título y fecha son obligatorios");
+
+  const accessToken = await getAccessToken();
+  try {
+    await apiPatch(
+      `/tenants/${tenantSlug}/shows/${showId}`,
+      {
+        title,
+        date: new Date(dateStr).toISOString(),
+        capacity,
+        ticketPrice,
+        ...(artistNames.length > 0 && { artistNames }),
+        ...(genre && { genre }),
+      },
+      accessToken ?? undefined,
+    );
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo actualizar el show"));
+  }
+
+  revalidatePath(`/${tenantSlug}`);
+  revalidatePath(`/${tenantSlug}/admin`);
+  redirect(`/${tenantSlug}/admin`);
+}
+
+export async function cancelReservationAction(formData: FormData) {
+  const tenantSlug = String(formData.get("tenantSlug"));
+  const reservationId = String(formData.get("reservationId"));
+
+  const accessToken = await getAccessToken();
+  try {
+    await apiPatch(`/tenants/${tenantSlug}/reservations/${reservationId}/cancel`, undefined, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo cancelar la reserva"));
+  }
+
+  revalidatePath(`/${tenantSlug}/admin`);
+  revalidatePath("/reservas");
+  revalidatePath("/perfil");
+}
+
 export async function toggleFavoriteAction(tenantSlug: string, favorite: boolean) {
   const accessToken = await getAccessToken();
   if (!accessToken) throw new Error("No autenticado");

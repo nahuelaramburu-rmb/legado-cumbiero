@@ -98,6 +98,11 @@ export class TenantsService {
         description: dto.description ?? '',
         accentColor: dto.accentColor ?? '#E9376F',
         amenities: dto.amenities?.length ? dto.amenities : ['Bailable', 'Bar'],
+        address: dto.address,
+        contactPhone: dto.contactPhone,
+        instagram: dto.instagram,
+        openingHours: dto.openingHours,
+        minAge: dto.minAge,
       },
     });
   }
@@ -116,6 +121,11 @@ export class TenantsService {
         ...(dto.description !== undefined && { description: dto.description }),
         ...(dto.accentColor !== undefined && { accentColor: dto.accentColor }),
         ...(dto.amenities !== undefined && { amenities: dto.amenities }),
+        ...(dto.address !== undefined && { address: dto.address }),
+        ...(dto.contactPhone !== undefined && { contactPhone: dto.contactPhone }),
+        ...(dto.instagram !== undefined && { instagram: dto.instagram }),
+        ...(dto.openingHours !== undefined && { openingHours: dto.openingHours }),
+        ...(dto.minAge !== undefined && { minAge: dto.minAge }),
       },
     });
   }

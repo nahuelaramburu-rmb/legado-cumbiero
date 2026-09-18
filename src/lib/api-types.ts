@@ -39,6 +39,11 @@ export interface Tenant {
   amenities: string[];
   logoUrl: string | null;
   coverImageUrl: string | null;
+  address: string | null;
+  contactPhone: string | null;
+  instagram: string | null;
+  openingHours: string | null;
+  minAge: number | null;
   isActive: boolean;
   createdAt: string;
 }

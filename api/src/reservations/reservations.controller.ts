@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PermissionKey, Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -33,5 +33,13 @@ export class ReservationsController {
   @Get('reservations')
   list(@Param('tenantSlug') tenantSlug: string) {
     return this.reservationsService.listByTenant(tenantSlug);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.TENANT_ADMIN, Role.TENANT_STAFF)
+  @RequirePermission(PermissionKey.RESERVATIONS_MANAGE)
+  @UseGuards(RolesGuard, TenantScopeGuard, PermissionsGuard)
+  @Patch('reservations/:id/cancel')
+  cancel(@Param('tenantSlug') tenantSlug: string, @Param('id') id: string) {
+    return this.reservationsService.cancel(tenantSlug, id);
   }
 }
