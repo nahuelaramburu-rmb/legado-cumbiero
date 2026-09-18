@@ -25,7 +25,12 @@ export function EventCard({ show, tenant, big = false }: { show: Show; tenant: T
       <div
         className={`relative overflow-hidden bg-black ${big ? "h-40" : "h-32"}`}
       >
-        <DiscoScene tint={tenant.accentColor} variant="card" />
+        {show.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={show.imageUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <DiscoScene tint={tenant.accentColor} variant="card" />
+        )}
         <span
           className="date-pill absolute left-3 top-3 z-10"
           style={{ backgroundColor: tenant.accentColor, color: textColor }}

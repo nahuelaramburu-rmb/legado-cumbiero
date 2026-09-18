@@ -208,6 +208,8 @@ model Show {
   date        DateTime
   capacity    Int      @default(200)
   ticketPrice Int      @default(0)
+  /// Ruta pública (/uploads/shows/<id>/...) — null hasta que se suba una.
+  imageUrl    String?
   /// Desactivar = "borrar" reversible: desaparece de los listados públicos.
   isActive    Boolean  @default(true)
 

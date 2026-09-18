@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { apiDelete, apiPatch, apiPost, ApiError } from "@/lib/api-client";
+import { apiDelete, apiPatch, apiPatchMultipart, apiPost, ApiError } from "@/lib/api-client";
 import { getAccessToken } from "@/lib/session";
 
 function apiErrorMessage(err: unknown, fallback: string): string {
@@ -153,6 +153,31 @@ export async function updateShowDetailsAction(formData: FormData) {
   revalidatePath(`/${tenantSlug}`);
   revalidatePath(`/${tenantSlug}/admin`);
   redirect(`/${tenantSlug}/admin`);
+}
+
+export async function updateShowImageAction(formData: FormData) {
+  const tenantSlug = String(formData.get("tenantSlug"));
+  const showId = String(formData.get("showId"));
+  const image = formData.get("image");
+
+  if (!(image instanceof File) || image.size === 0) {
+    throw new Error("Elegí una imagen para subir");
+  }
+
+  const upload = new FormData();
+  upload.set("image", image);
+
+  const accessToken = await getAccessToken();
+  try {
+    await apiPatchMultipart(`/tenants/${tenantSlug}/shows/${showId}/image`, upload, accessToken ?? undefined);
+  } catch (err) {
+    throw new Error(apiErrorMessage(err, "No se pudo subir la imagen"));
+  }
+
+  revalidatePath(`/${tenantSlug}`);
+  revalidatePath(`/${tenantSlug}/admin`);
+  revalidatePath("/eventos");
+  revalidatePath("/");
 }
 
 export async function cancelReservationAction(formData: FormData) {

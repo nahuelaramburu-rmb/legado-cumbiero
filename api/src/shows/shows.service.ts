@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { saveUploadedImage } from '../common/uploads';
 import { PrismaService } from '../prisma/prisma.service';
 import { TenantsService } from '../tenants/tenants.service';
 import { CreateShowDto } from './dto/create-show.dto';
@@ -122,6 +123,18 @@ export class ShowsService {
         }
       }
     });
+
+    return this.findByIdOrThrow(showId);
+  }
+
+  async updateImage(tenantSlug: string, showId: string, file?: Express.Multer.File) {
+    const tenant = await this.tenants.findBySlugOrThrow(tenantSlug);
+    const show = await this.prisma.show.findFirst({ where: { id: showId, tenantId: tenant.id } });
+    if (!show) throw new NotFoundException('Show no encontrado');
+    if (!file) throw new BadRequestException('No se recibió ninguna imagen');
+
+    const imageUrl = await saveUploadedImage('shows', show.id, 'image', file, show.imageUrl);
+    await this.prisma.show.update({ where: { id: showId }, data: { imageUrl } });
 
     return this.findByIdOrThrow(showId);
   }

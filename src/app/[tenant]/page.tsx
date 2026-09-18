@@ -147,28 +147,38 @@ export default async function TenantPage({
               const remaining = Math.max(show.capacity - show.reservedCount, 0);
               const genre = show.lineup[0]?.artist.genre || "Cumbia";
               return (
-                <div key={show.id} className="card p-6 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <div className="mb-1 flex items-center gap-2">
-                      <p className="text-sm font-semibold text-cumbia-yellow">
-                        {new Intl.DateTimeFormat("es-AR", {
-                          weekday: "short",
-                          day: "numeric",
-                          month: "short",
-                        }).format(new Date(show.date))}
+                <div key={show.id} className="card p-6 sm:flex sm:items-center sm:justify-between sm:gap-5">
+                  <div className="flex items-center gap-4">
+                    {show.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={show.imageUrl}
+                        alt=""
+                        className="hidden h-16 w-16 shrink-0 rounded-xl object-cover sm:block"
+                      />
+                    )}
+                    <div>
+                      <div className="mb-1 flex items-center gap-2">
+                        <p className="text-sm font-semibold text-cumbia-yellow">
+                          {new Intl.DateTimeFormat("es-AR", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          }).format(new Date(show.date))}
+                        </p>
+                        <span className="chip">{genre}</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-cumbia-cream">{show.title}</h3>
+                      <p className="mt-1 text-sm text-cumbia-cream/70">
+                        Line-up:{" "}
+                        {show.lineup
+                          .map((l) => `${l.artist.name}${l.slotTime ? ` (${l.slotTime})` : ""}`)
+                          .join(" · ")}
                       </p>
-                      <span className="chip">{genre}</span>
+                      <p className="mt-1 text-xs text-cumbia-cream/50">
+                        {remaining} entradas disponibles de {show.capacity}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-bold text-cumbia-cream">{show.title}</h3>
-                    <p className="mt-1 text-sm text-cumbia-cream/70">
-                      Line-up:{" "}
-                      {show.lineup
-                        .map((l) => `${l.artist.name}${l.slotTime ? ` (${l.slotTime})` : ""}`)
-                        .join(" · ")}
-                    </p>
-                    <p className="mt-1 text-xs text-cumbia-cream/50">
-                      {remaining} entradas disponibles de {show.capacity}
-                    </p>
                   </div>
                   <div className="mt-4 flex gap-3 sm:mt-0">
                     <Link

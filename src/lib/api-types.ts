@@ -78,6 +78,7 @@ export interface Show {
   date: string;
   capacity: number;
   ticketPrice: number;
+  imageUrl: string | null;
   isActive: boolean;
   lineup: LineupEntry[];
 }

@@ -4,7 +4,7 @@ import { apiGetOrNull } from "@/lib/api-client";
 import type { Show, Tenant } from "@/lib/api-types";
 import { TopNav } from "@/components/TopNav";
 import { IconArrowLeft } from "@/components/icons";
-import { updateShowDetailsAction } from "@/lib/actions";
+import { updateShowDetailsAction, updateShowImageAction } from "@/lib/actions";
 import { requireRole } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -116,6 +116,38 @@ export default async function EditShowPage({
           <div className="flex justify-end border-t border-white/10 pt-6 sm:col-span-2">
             <button type="submit" className="btn-primary px-8">
               Guardar cambios
+            </button>
+          </div>
+        </form>
+
+        <form
+          action={updateShowImageAction}
+          encType="multipart/form-data"
+          className="card mt-6 space-y-4 p-6 sm:p-8"
+        >
+          <input type="hidden" name="tenantSlug" value={tenantSlug} />
+          <input type="hidden" name="showId" value={show.id} />
+          <p className="font-medium text-cumbia-cream">Imagen del evento</p>
+          <p className="-mt-2 text-xs text-cumbia-cream/40">
+            Se usa en las tarjetas de eventos y en la página del boliche.
+          </p>
+          {show.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={show.imageUrl}
+              alt="Imagen actual"
+              className="h-32 w-full rounded-xl border border-white/10 object-cover"
+            />
+          )}
+          <input
+            type="file"
+            name="image"
+            accept="image/jpeg,image/png,image/webp"
+            className="w-full text-sm text-cumbia-cream/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-cumbia-cream file:transition hover:file:bg-white/20"
+          />
+          <div className="flex justify-end border-t border-white/10 pt-6">
+            <button type="submit" className="btn-primary px-8">
+              Subir imagen
             </button>
           </div>
         </form>
